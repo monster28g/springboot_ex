@@ -1,6 +1,7 @@
 package com.hhi.connected.platform.services;
 
 import com.hhi.connected.platform.models.Greeting;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -21,5 +22,12 @@ public class MyServiceImpl implements MyService {
     public Greeting home() {
 
         return new Greeting(0L, "none");
+    }
+
+    @Override
+    public Object tick() {
+
+        return new Greeting(counter.incrementAndGet(),
+                "tic toc: "+ new DateTime());
     }
 }

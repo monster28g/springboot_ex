@@ -51,16 +51,4 @@ public class GreetingControllerServiceTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andDo(print());
     }
-
-    @Test
-    public void testHome() throws Exception {
-
-        mockMvc.perform(get("/")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value("none"))
-                .andDo(print());
-    }
-
-
 }

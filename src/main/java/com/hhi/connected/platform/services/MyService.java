@@ -6,4 +6,5 @@ public interface MyService {
     public Greeting sayHello(String name);
 
     public Object home();
+    public Object tick();
 }

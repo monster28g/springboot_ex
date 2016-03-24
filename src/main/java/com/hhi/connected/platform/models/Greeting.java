@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Greeting implements Serializable{
 
-    private final long id;
+    private final Long id;
     private final String content;
 
     public Greeting(long id, String content) {
