@@ -55,16 +55,7 @@ public class GreetingControllerTest {
     }
 
     @Test
-    public void testHome() throws Exception {
+    public void testHello() throws Exception {
 
-        when(myService.home()).thenReturn(new Greeting(0L, NONE));
-
-        mockMvc.perform(get("/")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value(NONE))
-                .andDo(print());
     }
-
-
 }
