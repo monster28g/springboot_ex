@@ -37,6 +37,17 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jersey</artifactId>
+            <version>1.3.3.RELEASE</version>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
+
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-messaging</artifactId>
         </dependency>
@@ -71,6 +82,59 @@
             <artifactId>joda-time</artifactId>
             <version>2.9.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.hhi.vaas.platform</groupId>
+            <artifactId>push-client</artifactId>
+            <version>[0.8,)</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+            <version>2.22.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-common</artifactId>
+            <version>2.9</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.19</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <version>2.7.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-servlet</artifactId>
+            <version>1.19.1</version>
+        </dependency>
 
     </dependencies>
 
@@ -80,6 +144,22 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <!--<configuration>-->
+                    <!--<requiresUnpack>-->
+                        <!--<dependency>-->
+                            <!--<groupId>com.sun.jersey</groupId>-->
+                            <!--<artifactId>jersey-servlet</artifactId>-->
+                        <!--</dependency>-->
+                        <!--<dependency>-->
+                            <!--<groupId>com.sun.jersey</groupId>-->
+                            <!--<artifactId>jersey-server</artifactId>-->
+                        <!--</dependency>-->
+                        <!--<dependency>-->
+                            <!--<groupId>com.sun.jersey</groupId>-->
+                            <!--<artifactId>jersey-core</artifactId>-->
+                        <!--</dependency>-->
+                    <!--</requiresUnpack>-->
+                <!--</configuration>-->
             </plugin>
         </plugins>
     </build>
@@ -88,6 +168,10 @@
         <repository>
             <id>spring-releases</id>
             <url>https://repo.spring.io/libs-release</url>
+        </repository>
+        <repository>
+            <id>releases</id>
+            <url>https://repo-hivaas.hhi.co.kr/content/repositories/releases</url>
         </repository>
     </repositories>
     <pluginRepositories>
