@@ -2,6 +2,8 @@ package com.hhi.connected.platform.controllers;
 
 import com.hhi.connected.platform.models.HelloMessage;
 import com.hhi.connected.platform.services.MyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -18,13 +20,19 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 public class GreetingController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GreetingController.class);
 
     @Autowired
     MyService myService;
+
+////    @Autowired
+//    PushService pushService;
+
     private final AtomicLong counter = new AtomicLong();
 
     @Autowired
     private SimpMessagingTemplate template;
+
     private TaskScheduler scheduler = new ConcurrentTaskScheduler();
 
     @RequestMapping(value = "/greeting", method = RequestMethod.GET )
@@ -44,13 +52,9 @@ public class GreetingController {
             @Override public void run() {
                 tictocBroadcast();
             }
-        }, 10000L);
+        }, 60000L);
     }
 
-    /**
-     * Iterates stock list, update the price by randomly choosing a positive
-     * or negative percentage, then broadcast it to all subscribing clients
-     */
     private void tictocBroadcast() {
         template.convertAndSend("/topic/greetings", myService.tick());
     }
