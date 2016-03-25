@@ -8,7 +8,6 @@ import com.hhi.vaas.platform.middleware.client.rest.APIGatewayClient;
 import com.hhi.vaas.platform.middleware.client.websocket.EventHandler;
 import com.hhi.vaas.platform.middleware.client.websocket.WebSocketClient;
 import org.apache.commons.io.IOUtils;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -218,7 +217,7 @@ public class PushServiceImpl implements PushService{
                 LOGGER.debug("Received Message via WebSocket : " + msg);
 
                 if(template != null) {
-                    template.convertAndSend("/topic/greetings", new Greeting(0L, "contents: " + msg + "\n" + new DateTime()));
+                    template.convertAndSend("/topic/greetings", new Greeting(0L, msg));
                 }
 
                 /** in case of ackMode is enable, invoke sendAck or sendNack to receive next message */
