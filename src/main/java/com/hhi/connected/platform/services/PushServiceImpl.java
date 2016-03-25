@@ -212,7 +212,7 @@ public class PushServiceImpl implements PushService{
                 }
 
                 /** in case of ackMode is enable, invoke sendAck or sendNack to receive next message */
-//                sendAck();
+                sendAck();
 //                sendNack();
             }
 
