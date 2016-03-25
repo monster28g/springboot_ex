@@ -159,6 +159,16 @@ public class PushServiceImpl implements PushService{
         }
     }
 
+    @Override
+    public boolean isConnected() {
+        return this.websocketClient.isConnected();
+    }
+
+    @Override
+    public void reStart() {
+
+    }
+
     public void startAlarm() throws Exception{
         if (createAlarmEventRule()) {
             LOGGER.debug("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
