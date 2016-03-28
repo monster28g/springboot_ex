@@ -9,6 +9,8 @@ import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
 import javax.ws.rs.client.Client;
@@ -32,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RegisterUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegisterUtil.class);
     public static final ObjectMapper mapper = new ObjectMapper();
 
     /**
@@ -79,7 +82,7 @@ public class RegisterUtil {
      */
     @SuppressWarnings("unchecked")
     public static APIInfo registCertificate(String webUrl, String appName, PrivateKey key, URI dplFile) throws Exception {
-        String result = null;
+        String result;
 
 		/*
 		 * url :   api url + "/{appName}"
@@ -101,10 +104,9 @@ public class RegisterUtil {
         Response response = webTarget.request().post(Entity.entity(multiPart, MediaType.MULTIPART_FORM_DATA));
         result = response.readEntity(String.class);
 
-        System.err.println("result : " + result);
+        LOGGER.debug("result : " + result);
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        map = mapper.readValue(result, new TypeReference<HashMap<String, Object>>(){});
+        Map<String, Object> map = mapper.readValue(result, new TypeReference<HashMap<String, Object>>(){});
 
         if (map.get("message") != null) {
             throw new Exception((String) map.get("message"));
@@ -173,7 +175,7 @@ public class RegisterUtil {
         // List the aliases
         Enumeration<String> aliases = keystore.aliases();
         while (aliases.hasMoreElements()) {
-            String alias = (String) aliases.nextElement();
+            String alias = aliases.nextElement();
 
             if (keystore.isKeyEntry(alias)) {
                 key = keystore.getKey(alias, password.toCharArray());

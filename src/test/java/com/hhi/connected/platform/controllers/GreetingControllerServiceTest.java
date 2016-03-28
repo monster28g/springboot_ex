@@ -48,7 +48,8 @@ public class GreetingControllerServiceTest {
         mockMvc.perform(get("/greeting")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.content").value("Hello, World!"))
                 .andDo(print());
     }
+
 }

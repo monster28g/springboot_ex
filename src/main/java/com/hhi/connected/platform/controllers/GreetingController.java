@@ -6,9 +6,11 @@ import com.hhi.connected.platform.services.PushService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -52,7 +54,6 @@ public class GreetingController {
     @PostConstruct
     private void broadcastTimePeriodically() {
         scheduler.scheduleAtFixedRate((Runnable) this::tictoc, 60000L);
-
         scheduler.scheduleAtFixedRate((Runnable) this::keepAlivePushService, 10000L);
 
     }
@@ -68,5 +69,11 @@ public class GreetingController {
 
     private void tictoc() {
         template.convertAndSend("/topic/greetings", myService.tick());
+    }
+
+    @MessageExceptionHandler
+    @SendToUser("/queue/errors")
+    public String handleException(Throwable exception) {
+        return exception.getMessage();
     }
 }

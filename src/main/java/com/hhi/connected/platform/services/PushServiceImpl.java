@@ -142,19 +142,12 @@ public class PushServiceImpl implements PushService{
     // 1. Create a CEP event rule for 3rd party
         if (createSensorEventRule()) {
             LOGGER.debug("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
-//            Thread.sleep(15000);
 
             // 2. Get an event data using REST API
 //            getDataUsingRest(cepApiUrl + "/getSensorData?ruleName=" + sensorRuleName);
 
             // 3. Get event data using WebScoket
             getDataUsingWebSocket(pushApiUrl + "/sensor", sensorRuleName);
-
-//            // 4. Close a WebSocket Session
-//            Thread.sleep(duration * 60 * 1000);
-//            closeWebSocket();
-//
-//            deleteSensorEventRules(sensorRuleName);
         }
     }
 
@@ -179,12 +172,6 @@ public class PushServiceImpl implements PushService{
 
             // 3. Get event data using WebScoket
             getDataUsingWebSocket(pushApiUrl + "/alarm", alarmRuleName);
-
-            // 4. Close a WebSocket Session
-//            Thread.sleep(duration * 60 * 1000);
-//            closeWebSocket();
-//
-//            deleteAlarmEventRules(alarmRuleName);
         }
 
     }
@@ -221,8 +208,7 @@ public class PushServiceImpl implements PushService{
                 }
 
                 /** in case of ackMode is enable, invoke sendAck or sendNack to receive next message */
-                sendAck();
-//                sendNack();
+                sendAck();// sendNack();
             }
 
             @Override
@@ -304,10 +290,9 @@ public class PushServiceImpl implements PushService{
     }
 
     private boolean createSensorEventRule() throws Exception {
-//        String fullPaths = "Mechanical/Machinery/DieselEngine/MainEngine1/TurboCharger1.RPM.val";
 		String fullPaths = "*";
 
-        Integer timeWindow = 10;
+        Integer timeWindow = 1;
 
         return createRule(cepApiUrl + "/createSensorRule", fullPaths, timeWindow, sensorRuleName);
         
