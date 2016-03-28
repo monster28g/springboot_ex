@@ -153,19 +153,19 @@ public class PushServiceImpl implements PushService{
 
     @Override
     public boolean isConnected() {
-        return this.websocketClient.isConnected();
+        return this.websocketClient.isAlive();
     }
 
     @Override
-    public void reStart() {
+    public void reStart() throws Exception {
+        init();
+        run();
 
     }
 
     public void startAlarm() throws Exception{
         if (createAlarmEventRule()) {
             LOGGER.debug("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
-
-//            Thread.sleep(15000);
 
             // 2. Get an event data using REST API
             getDataUsingRest(cepApiUrl + "/getAlarmData?ruleName=" + alarmRuleName);
@@ -223,7 +223,9 @@ public class PushServiceImpl implements PushService{
             }
 
             @Override
-            public void handleErrorEvent(Throwable t) { /** describe something to do */ }
+            public void handleErrorEvent(Throwable t) {
+                t.printStackTrace();
+            }
         };
 
         websocketClient = new WebSocketClient(new URI(endpointURI), username, password, ruleName, ackMode, handler);

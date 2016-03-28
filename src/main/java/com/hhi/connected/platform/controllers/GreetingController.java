@@ -64,6 +64,11 @@ public class GreetingController {
         }else{
             // TODO restart pushService
             LOGGER.debug("push service is not alive");
+            try {
+                pushService.reStart();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

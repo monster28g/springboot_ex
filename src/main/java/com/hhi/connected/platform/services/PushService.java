@@ -6,5 +6,5 @@ public interface PushService {
     public void startSensor() throws Exception;
 
     public boolean isConnected();
-    public void reStart();
+    public void reStart() throws Exception;
 }
