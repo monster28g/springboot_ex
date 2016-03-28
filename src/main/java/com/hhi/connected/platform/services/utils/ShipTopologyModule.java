@@ -46,7 +46,7 @@ public class ShipTopologyModule {
                 try {
                     createPath((Map<String, Object>) e.getValue(), getPath(path, depth, e), depth + 1);
                 }catch (ClassCastException e1){
-//                    e1.printStackTrace();
+                    LOGGER.debug(e1.getMessage());
                 }
 
             }

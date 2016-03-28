@@ -21,6 +21,10 @@ public class MyParserImpl implements MyParser{
     @Autowired
     ShipTopologyModule shipTopologyModule;
 
+    public void setShipTopologyModule(ShipTopologyModule shipTopologyModule) {
+        this.shipTopologyModule = shipTopologyModule;
+    }
+
     @Override
     public String parse(String message) {
         try {
