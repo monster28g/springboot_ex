@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.ws.rs.core.Response;
 import java.io.File;
@@ -28,6 +29,9 @@ public class PushServiceImpl implements PushService{
 
     @Autowired
     private SimpMessagingTemplate template;
+
+    @Autowired
+    private MyParser myParser;
 
     private APIGatewayClient apiGatewayClient;
     private WebSocketClient websocketClient;
@@ -167,9 +171,6 @@ public class PushServiceImpl implements PushService{
         if (createAlarmEventRule()) {
             LOGGER.debug("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
 
-            // 2. Get an event data using REST API
-            getDataUsingRest(cepApiUrl + "/getAlarmData?ruleName=" + alarmRuleName);
-
             // 3. Get event data using WebScoket
             getDataUsingWebSocket(pushApiUrl + "/alarm", alarmRuleName);
         }
@@ -204,7 +205,10 @@ public class PushServiceImpl implements PushService{
                 LOGGER.debug("Received Message via WebSocket : " + msg);
 
                 if(template != null) {
-                    template.convertAndSend("/topic/greetings", new Greeting(0L, msg));
+                    String payload = myParser.parse(msg);
+                    if(!StringUtils.isEmpty(msg)) {
+                        template.convertAndSend("/topic/greetings", new Greeting(0L, payload));
+                    }
                 }
 
                 /** in case of ackMode is enable, invoke sendAck or sendNack to receive next message */
