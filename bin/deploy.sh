@@ -7,3 +7,4 @@ fi
 
 mvn clean package
 scp target/ee-0.0.1-SNAPSHOT.jar root@$1:/root/Downloads/smartee/
+scp -r target/classes root@$1:/root/Downloads/smartee/

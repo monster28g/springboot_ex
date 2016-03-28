@@ -46,6 +46,14 @@
             p.appendChild(document.createTextNode(message));
             response.appendChild(p);
         }
+        // in JavaScript Code
+        function onKeyDown()
+        {
+             if(event.keyCode == 13)
+             {
+                  sendName();
+             }
+        }
     </script>
 </head>
 <body onload="disconnect()">
@@ -57,8 +65,8 @@
         <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
     </div>
     <div id="conversationDiv">
-        <label>What is your name?</label><input type="text" id="name" />
-        <button id="sendName" onclick="sendName();">Send</button>
+        <label>What is your name?</label><input type="text" id="name" onKeyDown="onKeyDown();" />
+        <button id="sendName" onclick="sendName(); ">Send</button>
         <p id="response"></p>
     </div>
 </div>
