@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hhi.connected.platform.handlers.ModelHandler;
 import com.hhi.connected.platform.models.BaseModel;
-import com.hhi.connected.platform.services.utils.MyStreamUtils;
 import com.hhi.connected.platform.services.utils.ShipTopologyModule;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,11 +55,8 @@ public class MyParserImpl implements MyParser{
 
     private String toJson(Map<String, Object> message) {
         try {
-
-            return new ObjectMapper().writeValueAsString(
-                    distinct(message).entrySet().stream()
-                            .map(convertListToSingleStringFunction()).collect(Collectors.toList())
-            );
+            Map<String, List<BaseModel>> sorted = modelHandler.process(message).stream().collect(Collectors.groupingBy(BaseModel::getKey));
+            return new ObjectMapper().writeValueAsString(sorted.entrySet().stream().map(this::removeSequentialDuplicates).map(convertListToSingleStringFunction()).collect(Collectors.toList()));
 
         } catch (JsonProcessingException e) {
             LOGGER.debug(e.getMessage());
@@ -67,10 +64,28 @@ public class MyParserImpl implements MyParser{
         }
     }
 
-    private Map<String, List<BaseModel>> distinct(Map<String, Object> message) {
-        return modelHandler.process(message)
-                .stream().filter(MyStreamUtils.distinctByKey(BaseModel::getValue))
-                .collect(Collectors.groupingBy(BaseModel::getKey));
+    // FIXME
+    public Map.Entry<String, List<BaseModel>> removeSequentialDuplicates(Map.Entry<String, List<BaseModel>> e) {
+
+        Collection<BaseModel> tobeRemoved = new ArrayList<>();
+
+        for(int i = 0; i < e.getValue().size(); i++){
+            if(i > 0  && isSequentiallyDuplicated(e.getValue(), i)){
+                tobeRemoved.add(e.getValue().get(i));
+            }
+        }
+
+        if(CollectionUtils.isNotEmpty(tobeRemoved)){
+            List<BaseModel> tmp = new ArrayList<>(e.getValue());
+            tmp.removeAll(tobeRemoved);
+            e.setValue(tmp);
+        }
+
+        return e;
+    }
+
+    private boolean isSequentiallyDuplicated(List<BaseModel> e, int i) {
+        return e.get(i).getValue().equals(e.get(i - 1).getValue());
     }
 
     private Function<Map.Entry<String, List<BaseModel>>, Map> convertListToSingleStringFunction() {

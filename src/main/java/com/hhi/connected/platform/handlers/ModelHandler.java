@@ -32,6 +32,8 @@ public class ModelHandler {
                 }
             }});
 
+        list.sort(Comparator.comparing(BaseModel::getTimestamp));
+        
         return list;
     }
 

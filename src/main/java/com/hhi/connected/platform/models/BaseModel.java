@@ -2,9 +2,9 @@ package com.hhi.connected.platform.models;
 
 public class BaseModel {
     String key;
-    float value;
-    long timestamp;
-    int valid;
+    Float value;
+    Long timestamp;
+    Integer valid;
 
     public BaseModel(String key, Long timestamp, Float value, Integer valid) {
         this.key = key;
@@ -20,24 +20,24 @@ public class BaseModel {
         this.key = key;
     }
 
-    public float getValue() {
+    public Float getValue() {
         return value;
     }
-    public void setValue(float value) {
+    public void setValue(Float value) {
         this.value = value;
     }
 
-    public long getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
-    public void setTimestamp(long timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 
-    public int getValid() {
+    public Integer getValid() {
         return valid;
     }
-    public void setValid(int valid) {
+    public void setValid(Integer valid) {
         this.valid = valid;
     }
 }
