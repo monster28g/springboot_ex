@@ -19,9 +19,6 @@ public class MyParserImplTest {
 
     MyParserImpl myParser;
 
-    ShipTopologyModule shipTopologyModule;
-
-
     @Before
     public void setUp() throws Exception {
         myParser = new MyParserImpl();
