@@ -68,8 +68,8 @@ public class PushServiceImpl implements PushService{
     private static int duration = 10;
 
     public PushServiceImpl() throws Exception {
-        init();
-        run();
+//        init();
+//        run();
     }
 
     private void run() throws Exception {
@@ -147,17 +147,17 @@ public class PushServiceImpl implements PushService{
         if (createSensorEventRule()) {
             LOGGER.debug("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
 
-            // 2. Get an event data using REST API
-//            getDataUsingRest(cepApiUrl + "/getSensorData?ruleName=" + sensorRuleName);
-
             // 3. Get event data using WebScoket
             getDataUsingWebSocket(pushApiUrl + "/sensor", sensorRuleName);
+        } else {
+            LOGGER.debug("create EventRule has failed");
+            init();
         }
     }
 
     @Override
     public boolean isConnected() {
-        return this.websocketClient.isAlive();
+        return this.websocketClient != null && this.websocketClient.isAlive();
     }
 
     @Override
@@ -199,7 +199,6 @@ public class PushServiceImpl implements PushService{
         EventHandler handler = new EventHandler() {
             @Override
             public void handleMessageEvent(String msg) {
-
 
                 /** describe something to do */
                 LOGGER.debug("Received Message via WebSocket : " + msg);
