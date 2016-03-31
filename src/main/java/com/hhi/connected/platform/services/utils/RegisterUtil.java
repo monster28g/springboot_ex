@@ -81,7 +81,7 @@ public class RegisterUtil {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    public static APIInfo registCertificate(String webUrl, String appName, PrivateKey key, URI dplFile) throws Exception {
+    private static APIInfo registCertificate(String webUrl, String appName, PrivateKey key, URI dplFile) throws Exception {
         String result;
 
 		/*

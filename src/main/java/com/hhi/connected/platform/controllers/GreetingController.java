@@ -54,20 +54,21 @@ public class GreetingController {
     @PostConstruct
     private void broadcastTimePeriodically() {
         scheduler.scheduleAtFixedRate((Runnable) this::tictoc, 60000L);
-        scheduler.scheduleAtFixedRate((Runnable) this::keepAlivePushService, 10000L);
+        scheduler.scheduleAtFixedRate((Runnable) this::keepAlivePushService, 60000L);
 
     }
 
     private void keepAlivePushService() {
-        if(pushService.isConnected()){
-            LOGGER.debug("push service is alive");
-        }else{
-            // TODO restart pushService
-            LOGGER.debug("push service is not alive");
-            try {
-                pushService.reStart();
-            } catch (Exception e) {
-                e.printStackTrace();
+        if(pushService != null) {
+            if (pushService.isConnected()) {
+                LOGGER.debug("push service is alive");
+            } else {
+                LOGGER.debug("push service is not alive");
+                try {
+                    pushService.reStart();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

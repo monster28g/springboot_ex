@@ -2,8 +2,12 @@
 
 ### `git clone https://github.com/monster28g/springboot_ex`
 
+## MAVEN
 ### BUILD
 ` mvn clean package`
+
+### run the service
+` mvn exec:java`
 
 ### Test the service
 
@@ -18,3 +22,10 @@ This change demonstrates that the @RequestParam arrangement in GreetingControlle
 Notice also how the id attribute has changed from 1 to 2. This proves that you are working against the same GreetingController instance across multiple requests, and that its counter field is being incremented on each call as expected.
 
 test
+
+## GRADLE
+### BUILD
+./gradlew clean build -x test
+
+### Test the service
+./gradlew bootRun
