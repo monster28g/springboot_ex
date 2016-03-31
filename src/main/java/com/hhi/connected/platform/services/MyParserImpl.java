@@ -5,8 +5,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hhi.connected.platform.handlers.ModelHandler;
 import com.hhi.connected.platform.models.BaseModel;
+import com.hhi.connected.platform.services.utils.MyListUtils;
 import com.hhi.connected.platform.services.utils.ShipTopologyModule;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,16 @@ public class MyParserImpl implements MyParser{
 
     @Autowired
     private ModelHandler modelHandler;
+
+    @Autowired
+    private CacheDataService cacheDataService;
+
+    public void setCacheDataService(CacheDataService cacheDataService) {
+        this.cacheDataService = cacheDataService;
+    }
+    public CacheDataService getCacheDataService() {
+        return cacheDataService;
+    }
 
     public void setShipTopologyModule(ShipTopologyModule shipTopologyModule) {
         this.shipTopologyModule = shipTopologyModule;
@@ -56,6 +68,13 @@ public class MyParserImpl implements MyParser{
     private String toJson(Map<String, Object> message) {
         try {
             Map<String, List<BaseModel>> sorted = modelHandler.process(message).stream().collect(Collectors.groupingBy(BaseModel::getKey));
+
+            if(MapUtils.isEmpty(sorted))
+            {
+                return null;
+            }
+
+            // TODO need to bulk process for only getting data from the cache but also updating latest data to the cache
             return new ObjectMapper().writeValueAsString(sorted.entrySet().stream().map(this::removeSequentialDuplicates).map(convertListToSingleStringFunction()).collect(Collectors.toList()));
 
         } catch (JsonProcessingException e) {
@@ -64,25 +83,41 @@ public class MyParserImpl implements MyParser{
         }
     }
 
-    // FIXME
-    public Map.Entry<String, List<BaseModel>> removeSequentialDuplicates(Map.Entry<String, List<BaseModel>> e) {
 
-        Collection<BaseModel> tobeRemoved = new ArrayList<>();
+    public Map.Entry<String, List<BaseModel>> removeSequentialDuplicates(Map.Entry<String, List<BaseModel>> entry) {
 
-        for(int i = 0; i < e.getValue().size(); i++){
-            if(i > 0  && isSequentiallyDuplicated(e.getValue(), i)){
-                tobeRemoved.add(e.getValue().get(i));
+        List tobeRemoved = new ArrayList<>();
+
+        entry = loadFromCache(entry, tobeRemoved);
+
+        // FIXME || MODIFY ME
+        for(int i = 0; i < entry.getValue().size(); i++){
+            if(i > 0  && isSequentiallyDuplicated(entry.getValue(), i)){
+                tobeRemoved.add(entry.getValue().get(i));
             }
         }
 
         if(CollectionUtils.isNotEmpty(tobeRemoved)){
-            List<BaseModel> tmp = new ArrayList<>(e.getValue());
-            tmp.removeAll(tobeRemoved);
-            e.setValue(tmp);
+            entry.setValue(MyListUtils.subtract().apply(new ArrayList<>(entry.getValue())).apply(tobeRemoved));
         }
 
-        return e;
+        cacheDataService.update(entry);
+
+        return entry;
     }
+
+    private Map.Entry<String, List<BaseModel>> loadFromCache(Map.Entry<String, List<BaseModel>> entry, List tobeRemoved) {
+        BaseModel cached = cacheDataService.get(entry.getKey());
+
+        if(cached != null) {
+            entry.setValue(MyListUtils.addFirst().apply(new ArrayList<>(entry.getValue())).apply(cached));
+            tobeRemoved.add(cached);
+        }
+
+        return entry;
+    }
+
+
 
     private boolean isSequentiallyDuplicated(List<BaseModel> e, int i) {
         return e.get(i).getValue().equals(e.get(i - 1).getValue());
@@ -93,8 +128,7 @@ public class MyParserImpl implements MyParser{
                 new AbstractMap.SimpleEntry<>(
                         e.getKey(),
                         e.getValue()
-                                .stream().map(m -> Arrays.asList(m.getTimestamp(), m.getValue(), m.getValid())).flatMap(Collection::stream)
-                                .collect(Collectors.toList()))
+                                .stream().map(m -> Arrays.asList(m.getTimestamp(), m.getValue(), m.getValid())).flatMap(Collection::stream).collect(Collectors.toList()))
         ).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue)));
     }
 

@@ -7,10 +7,11 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class CacheDataServiceImplTest {
@@ -54,5 +55,19 @@ public class CacheDataServiceImplTest {
         cacheDataService.setLatest(expectedMap);
 
         assertTrue(MyMapUtils.mapDifference(expectedMap, cacheDataService.getLatest()).size() == 0);
+    }
+
+    @Test
+    public void lastElementStream() {
+
+        Optional<String> optionalJava = Stream.of("a", "b", "c").reduce(
+                (a, b) -> b);
+
+        assertEquals("c", optionalJava.get());
+
+        String lastValue = Stream.of("a", "b", "c").reduce((a, b) -> b)
+                .orElse("false");
+
+        assertEquals("c", lastValue);
     }
 }
