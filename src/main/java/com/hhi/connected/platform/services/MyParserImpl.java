@@ -55,9 +55,7 @@ public class MyParserImpl implements MyParser{
             if(StringUtils.isEmpty(message)){
                 return null;
             }
-            return toJson(shipTopologyModule.refine(
-                    new ObjectMapper().readValue(message, new TypeReference<Map<String, Object>>() {})
-            ));
+            return toJson(shipTopologyModule.refine(new ObjectMapper().readValue(message, new TypeReference<Map<String, Object>>() {})));
         } catch (IOException e) {
             LOGGER.debug(e.getMessage());
             return null;
@@ -71,11 +69,14 @@ public class MyParserImpl implements MyParser{
 
             if(MapUtils.isEmpty(sorted))
             {
+                LOGGER.debug("sorted map is null");
                 return null;
             }
 
             // TODO need to bulk process for only getting data from the cache but also updating latest data to the cache
-            return new ObjectMapper().writeValueAsString(sorted.entrySet().stream().map(this::removeSequentialDuplicates).map(convertListToSingleStringFunction()).collect(Collectors.toList()));
+            List result = sorted.entrySet().stream().map(this::removeSequentialDuplicates).filter(e -> !e.getValue().isEmpty()).map(convertListToSingleStringFunction()).collect(Collectors.toList());
+
+            return CollectionUtils.isEmpty(result) ? null : new ObjectMapper().writeValueAsString(result);
 
         } catch (JsonProcessingException e) {
             LOGGER.debug(e.getMessage());
@@ -116,8 +117,6 @@ public class MyParserImpl implements MyParser{
 
         return entry;
     }
-
-
 
     private boolean isSequentiallyDuplicated(List<BaseModel> e, int i) {
         return e.get(i).getValue().equals(e.get(i - 1).getValue());

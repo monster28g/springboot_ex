@@ -54,7 +54,7 @@ public class GreetingController {
     @PostConstruct
     private void broadcastTimePeriodically() {
         scheduler.scheduleAtFixedRate((Runnable) this::tictoc, 60000L);
-//        scheduler.scheduleAtFixedRate((Runnable) this::keepAlivePushService, 10000L);
+        scheduler.scheduleAtFixedRate((Runnable) this::keepAlivePushService, 60000L);
 
     }
 

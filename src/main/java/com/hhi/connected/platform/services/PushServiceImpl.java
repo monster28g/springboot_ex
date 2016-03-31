@@ -26,6 +26,7 @@ import java.security.KeyStore;
 @Component
 public class PushServiceImpl implements PushService{
     private static final Logger LOGGER = LoggerFactory.getLogger(PushServiceImpl.class);
+    private static final String DESTINATION = "/topic/greetings";
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -68,8 +69,8 @@ public class PushServiceImpl implements PushService{
     private static int duration = 10;
 
     public PushServiceImpl() throws Exception {
-//        init();
-//        run();
+        init();
+        run();
     }
 
     private void run() throws Exception {
@@ -164,7 +165,6 @@ public class PushServiceImpl implements PushService{
     public void reStart() throws Exception {
         init();
         run();
-
     }
 
     public void startAlarm() throws Exception{
@@ -174,7 +174,6 @@ public class PushServiceImpl implements PushService{
             // 3. Get event data using WebScoket
             getDataUsingWebSocket(pushApiUrl + "/alarm", alarmRuleName);
         }
-
     }
 
     /**
@@ -201,12 +200,14 @@ public class PushServiceImpl implements PushService{
             public void handleMessageEvent(String msg) {
 
                 /** describe something to do */
-                LOGGER.debug("Received Message via WebSocket : " + msg);
+                LOGGER.trace("Received Message via WebSocket : " + msg);
 
                 if(template != null) {
                     String payload = myParser.parse(msg);
-                    if(!StringUtils.isEmpty(msg)) {
-                        template.convertAndSend("/topic/greetings", new Greeting(0L, payload));
+
+                    if(!(StringUtils.isEmpty(payload))) {
+                        LOGGER.trace("Sent Message via WebSocket : " + payload);
+                        template.convertAndSend(DESTINATION, new Greeting(0L, payload));
                     }
                 }
 

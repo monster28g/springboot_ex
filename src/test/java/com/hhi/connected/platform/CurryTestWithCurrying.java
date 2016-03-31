@@ -19,7 +19,6 @@ public class CurryTestWithCurrying {
                 ((Function<Integer, Function<Integer, Function<Integer, Integer>>>) x -> y -> t -> x + y * t)
                 .apply(b).apply(a))
                 .collect(Collectors.toList());
-
     }
 
 
@@ -35,7 +34,6 @@ public class CurryTestWithCurrying {
 
         System.out.println(((Function<List, Function<List, List>>) x -> y -> {x.removeAll(y);return x;})
                 .apply(new ArrayList<>(Arrays.asList(1, 2, 3))).apply(Arrays.asList(1, 2)));
-
     }
 
 }
