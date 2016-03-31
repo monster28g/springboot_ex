@@ -6,6 +6,9 @@
 ### BUILD
 ` mvn clean package`
 
+### run the service
+` mvn exec:java`
+
 ### Test the service
 
 Now that the service is up, visit http://localhost:8080/greeting, where you see:
