@@ -3,6 +3,7 @@ package com.hhi.connected.platform.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hhi.connected.platform.models.APIInfo;
 import com.hhi.connected.platform.models.Greeting;
+import com.hhi.connected.platform.models.PushServiceInfo;
 import com.hhi.connected.platform.services.utils.RegisterUtil;
 import com.hhi.vaas.platform.middleware.client.rest.APIGatewayClient;
 import com.hhi.vaas.platform.middleware.client.websocket.EventHandler;
@@ -37,27 +38,6 @@ public class PushServiceImpl implements PushService{
     private APIGatewayClient apiGatewayClient;
     private WebSocketClient websocketClient;
 
-    /** API Endpoints */
-    private String tokenApiUrl = "https://10.100.16.82:8343/token";
-    private String cepApiUrl = "http://10.100.16.82:8380/cep/1.0";
-//    private String registerApiUrl = "http://10.100.16.82:8380/register/v1.0";
-    private String registerApiUrl = "http://10.100.16.82:8080/auth/api/registCertificate_file";
-    private String pushApiUrl = "ws://10.100.16.82:9000/websocket";
-
-    /** App Info */
-    private String confFileName = "apiinfo.json";
-    private String registerAppName = "hhivaasdev3";
-    private String dplFileName = "hhivaasdev3_dpl.txt";
-    private String jksFileName = "hhivaasdev3.jks";
-    private String keyFileName = "hhivaasdev3_privateKey.key";
-    private String passPhrase = "changeit";
-
-    /** Push rule name which is created beforehand */
-    private String sensorRuleName = "sensor001";
-
-    /** Push rule name which is created beforehand */
-    private String alarmRuleName = "alarm001";
-
     /** 3rd Party username and password for authentication which is given at installation time */
     private static String username;
     private static String password;
@@ -80,41 +60,41 @@ public class PushServiceImpl implements PushService{
 
     private void init() throws Exception {
         if(registerSoftware()){
-            deleteSensorEventRules(sensorRuleName);
-            deleteAlarmEventRules(alarmRuleName);
+            deleteSensorEventRules(PushServiceInfo.sensorRuleName);
+            deleteAlarmEventRules(PushServiceInfo.alarmRuleName);
         }
     }
 
     // Register 3rd Party S/W Certificate and get API information
     public boolean registerSoftware() throws Exception {
-        File file = new File(PushServiceImpl.class.getResource("/").getFile(), confFileName);
+        File file = new File(PushServiceImpl.class.getResource("/").getFile(), PushServiceInfo.confFileName);
 
-        APIInfo apiInfo = null;
+        APIInfo apiInfo;
         if (!file.exists()) {
             // Not registered in VDIP
 
             // Loading Signed DPL
-            URI dplFile = PushServiceImpl.class.getResource("/" + dplFileName).toURI();
+            URI dplFile = PushServiceImpl.class.getResource("/" + PushServiceInfo.dplFileName).toURI();
 
             boolean usingKeyStore = true;
 
             if (usingKeyStore) {
                 // Loading keyStore
                 KeyStore keyStore  = KeyStore.getInstance(KeyStore.getDefaultType());
-                keyStore.load(PushServiceImpl.class.getResourceAsStream("/" + jksFileName), passPhrase.toCharArray());
+                keyStore.load(PushServiceImpl.class.getResourceAsStream("/" + PushServiceInfo.jksFileName), PushServiceInfo.passPhrase.toCharArray());
 
                 // Register 3rd Party S/W Certificate and get API information
-                apiInfo = RegisterUtil.registCertificate(registerApiUrl, registerAppName, keyStore, passPhrase, dplFile);
+                apiInfo = RegisterUtil.registCertificate(PushServiceInfo.registerApiUrl, PushServiceInfo.registerAppName, keyStore, PushServiceInfo.passPhrase, dplFile);
             } else {
                 // Loading privateKey
-                URI keyFile = PushServiceImpl.class.getResource("/" + keyFileName).toURI();
+                URI keyFile = PushServiceImpl.class.getResource("/" + PushServiceInfo.keyFileName).toURI();
 
                 // Register 3rd Party S/W Certificate and get API information
-                apiInfo = RegisterUtil.registCertificate(registerApiUrl, registerAppName, keyFile, dplFile);
+                apiInfo = RegisterUtil.registCertificate(PushServiceInfo.registerApiUrl, PushServiceInfo.registerAppName, keyFile, dplFile);
             }
 
             if (apiInfo != null) {
-                LOGGER.debug("[" + registerAppName + "] has been registered successfully.");
+                LOGGER.debug("[" + PushServiceInfo.registerAppName + "] has been registered successfully.");
                 LOGGER.debug(apiInfo.toString());
 
                 username = apiInfo.getUsername();
@@ -125,7 +105,7 @@ public class PushServiceImpl implements PushService{
                 IOUtils.write(RegisterUtil.mapper.writeValueAsString(apiInfo), new FileOutputStream(file));
                 return true;
             } else {
-                LOGGER.debug("[" + registerAppName + "] already registered but access info doesn't exist.");
+                LOGGER.debug("[" + PushServiceInfo.registerAppName + "] already registered but access info doesn't exist.");
                 return false;
             }
         } else {
@@ -149,7 +129,7 @@ public class PushServiceImpl implements PushService{
             LOGGER.debug("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
 
             // 3. Get event data using WebScoket
-            getDataUsingWebSocket(pushApiUrl + "/sensor", sensorRuleName);
+            getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/sensor", PushServiceInfo.sensorRuleName);
         } else {
             LOGGER.debug("create EventRule has failed");
             init();
@@ -172,7 +152,7 @@ public class PushServiceImpl implements PushService{
             LOGGER.debug("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
 
             // 3. Get event data using WebScoket
-            getDataUsingWebSocket(pushApiUrl + "/alarm", alarmRuleName);
+            getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/alarm", PushServiceInfo.alarmRuleName);
         }
     }
 
@@ -192,7 +172,7 @@ public class PushServiceImpl implements PushService{
      * @throws URISyntaxException
      * @throws InterruptedException
      */
-    public void getDataUsingWebSocket(String endpointURI, String ruleName) throws URISyntaxException, InterruptedException {
+    private void getDataUsingWebSocket(String endpointURI, String ruleName) throws URISyntaxException {
         final boolean ackMode = true;
 
         EventHandler handler = new EventHandler() {
@@ -220,7 +200,7 @@ public class PushServiceImpl implements PushService{
                 /** describe something to do */
                 LOGGER.debug("Status Code : " + statusCode + ", Reason : " + reason);
                 try {
-                    deleteSensorEventRules(sensorRuleName);
+                    deleteSensorEventRules(PushServiceInfo.sensorRuleName);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -248,7 +228,7 @@ public class PushServiceImpl implements PushService{
      * @param ruleName
      * @throws Exception
      */
-    public boolean deleteSensorEventRules(String ruleName) throws Exception {
+    private boolean deleteSensorEventRules(String ruleName) throws Exception {
         return deleteRules("deleteSensorRule", ruleName);
     }
 
@@ -258,7 +238,7 @@ public class PushServiceImpl implements PushService{
      * @param ruleName
      * @throws Exception
      */
-    public boolean deleteAlarmEventRules(String ruleName) throws Exception {
+    private boolean deleteAlarmEventRules(String ruleName) throws Exception {
         return deleteRules("deleteAlarmRule", ruleName);
     }
 
@@ -267,7 +247,7 @@ public class PushServiceImpl implements PushService{
             initClient();
         }
 
-        String apiUrl = cepApiUrl + "/" + ruleType + "?ruleName=" + ruleName;
+        String apiUrl = PushServiceInfo.cepApiUrl + "/" + ruleType + "?ruleName=" + ruleName;
 
         Response response = apiGatewayClient.deleteRequest(apiUrl);
 
@@ -300,7 +280,7 @@ public class PushServiceImpl implements PushService{
 
         Integer timeWindow = 1;
 
-        return createRule(cepApiUrl + "/createSensorRule", fullPaths, timeWindow, sensorRuleName);
+        return createRule(PushServiceInfo.cepApiUrl + "/createSensorRule", fullPaths, timeWindow, PushServiceInfo.sensorRuleName);
         
     }
 
@@ -309,7 +289,7 @@ public class PushServiceImpl implements PushService{
         String fullPaths = "*";
         Integer timeWindow = 2;
 
-        return createRule(cepApiUrl + "/createAlarmRule", fullPaths, timeWindow, alarmRuleName);
+        return createRule(PushServiceInfo.cepApiUrl + "/createAlarmRule", fullPaths, timeWindow, PushServiceInfo.alarmRuleName);
     }
 
     private boolean createRule(String apiUrl, String fullPaths, Integer timeWindow, String ruleName) throws Exception {
@@ -319,15 +299,15 @@ public class PushServiceImpl implements PushService{
 
         return apiGatewayClient.postRequest(
                 apiUrl,
-                new StringBuilder().append("ruleName=").append(URLEncoder.encode(ruleName, "UTF-8")).append("&")
-                        .append("fullPaths=").append(URLEncoder.encode(fullPaths, "UTF-8")).append("&")
-                        .append("timeWindow=").append(timeWindow).toString().getBytes()
+                ("ruleName=" + URLEncoder.encode(ruleName, "UTF-8") + "&" +
+                        "fullPaths=" + URLEncoder.encode(fullPaths, "UTF-8") + "&" +
+                        "timeWindow=" + timeWindow).getBytes()
                 )
                 .getStatus() == Response.Status.OK.getStatusCode();
     }
 
     private void initClient() {
-        apiGatewayClient = new APIGatewayClient(tokenApiUrl, username, password, consumerKey, consumerSecret);
+        apiGatewayClient = new APIGatewayClient(PushServiceInfo.tokenApiUrl, username, password, consumerKey, consumerSecret);
     }
 
 }

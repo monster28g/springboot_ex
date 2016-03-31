@@ -13,7 +13,7 @@ import java.util.Map;
 public class ShipTopologyModule {
     private static final Logger LOGGER = LoggerFactory.getLogger(ShipTopologyModule.class);
 
-    Map<String, Object> vdmpathSet = new HashMap<>();
+    private Map<String, Object> vdmpathSet = new HashMap<>();
 
     private static final String CARGO = "Cargo";
     private static final String ELECTRICAL = "Electrical";

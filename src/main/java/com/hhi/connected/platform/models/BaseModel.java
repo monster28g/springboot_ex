@@ -1,10 +1,10 @@
 package com.hhi.connected.platform.models;
 
 public class BaseModel {
-    String key;
-    Float value;
-    Long timestamp;
-    Integer valid;
+    private String key;
+    private Float value;
+    private Long timestamp;
+    private Integer valid;
 
     public BaseModel(String key, Long timestamp, Float value, Integer valid) {
         this.key = key;
