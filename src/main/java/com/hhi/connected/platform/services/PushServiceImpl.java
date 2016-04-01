@@ -49,14 +49,14 @@ public class PushServiceImpl implements PushService{
     private static int duration = 10;
 
     public PushServiceImpl() throws Exception {
-//        init();
-//        run();
+        init();
+        run();
     }
 
     @Override
     public void reStart() throws Exception {
-//        init();
-//        run();
+        init();
+        run();
     }
 
     private void run() throws Exception {
