@@ -15,6 +15,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -40,13 +41,25 @@ public class RestApiControllerTest {
     }
 
     @Test
-    public void getMeasurements() throws Exception {
-        when(tsdbHandler.getMeasurements("hivaas")).thenReturn(String.class);
+    public void testGetMeasurements() throws Exception {
+        when(tsdbHandler.getMeasurements(isA(String.class))).thenReturn(String.class);
 
-        mockMvc.perform(get("/api/query/measurements/{table}", "table")
+        mockMvc.perform(get("/api/query/measurements/{db}", "db")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
 
+    @Test
+    public void testQueries() throws Exception {
+        when(tsdbHandler.queries(isA(String.class), isA(String.class), isA(String.class))).thenReturn(String.class);
+
+        mockMvc.perform(get("/api/query")
+                .param("db","hivaas")
+                .param("epoch","ms")
+                .param("q","queries")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
 }

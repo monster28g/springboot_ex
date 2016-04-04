@@ -7,7 +7,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 
 @RestController
 public class RestApiController {
@@ -27,16 +31,14 @@ public class RestApiController {
     @RequestMapping(value = "/api/query", method = RequestMethod.GET )
     public Object queries(@RequestParam(value="db") String db,
                           @RequestParam(value="epoch") String epoch,
-                          @RequestParam(value="q") String q) {
+                          @RequestParam(value="q") String q) throws UnsupportedEncodingException {
 
         // TODO add Validator for PathVariable
         LOGGER.debug("query : db= {}, epoch = {}, q = {}", db, epoch, q);
 
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-//        return CollectionUtils.isEmpty(Arrays.asList(db, epoch, q))?
-//                new ResponseEntity<>(HttpStatus.BAD_REQUEST)
-//                : tsdbHandler.queries(db, epoch, q);
+        return CollectionUtils.isEmpty(Arrays.asList(db, epoch, q))?
+                new ResponseEntity<>(HttpStatus.BAD_REQUEST)
+                : tsdbHandler.queries(db, epoch, q);
 
     }
 }

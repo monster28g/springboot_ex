@@ -6,16 +6,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 @Component
 public class TSDBHandlerImpl implements TSDBHandler{
     private static final Logger LOGGER = LoggerFactory.getLogger(TSDBHandlerImpl.class);
 
-    private String host = "10.100.16.66";
-    private String port = "8086";
-    private String MEASUREMENTS = "SHOW+MEASUREMENTS";
+    private final String host = "10.100.16.66";
+    private final String port = "8086";
+    private final String MEASUREMENTS = "SHOW+MEASUREMENTS";
 
     @Autowired
-    RestApiService restApiService;
+    private RestApiService restApiService;
     private static final String query = "http://%s:%s/query?pretty=true&db=%s&epoch=%s&q=%s";
     private static final String measurementsQuery = "http://%s:%s/query?pretty=true&q=%s&db=%s";
 
@@ -26,9 +29,7 @@ public class TSDBHandlerImpl implements TSDBHandler{
     }
 
     @Override
-    public Object queries(String db, String epoch, String q) {
-        String request = String.format(query, host, port, db, epoch, q);
-        LOGGER.debug("request query : {}", request);
-        return restApiService.execute(request);
+    public Object queries(String db, String epoch, String q) throws UnsupportedEncodingException {
+        return restApiService.execute(String.format(query, host, port, db, epoch, URLEncoder.encode(q, "UTF-8")));
     }
 }
