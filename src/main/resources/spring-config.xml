@@ -12,6 +12,7 @@
     <!-- <bean/> definitions here -->
     <!--<import resource="websocket.xml" />-->
     <!--<mvc:annotation-driven />-->
+    <!--<context:component-scan base-package="com.hhi.connected.platform" />-->
     <!--<bean id="restTemplate" class="org.springframework.web.client.RestTemplate" />-->
 
 </beans>

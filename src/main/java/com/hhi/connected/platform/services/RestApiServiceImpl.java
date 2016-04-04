@@ -17,7 +17,8 @@ public class RestApiServiceImpl implements RestApiService{
     @Override
     public Object execute(String query) {
         try {
-            return new RestTemplate().getForObject(new URI(query), String.class);
+            LOGGER.debug("query : {}", new URI(query));
+            return new RestTemplate() .getForObject(new URI(query), String.class);
         } catch (URISyntaxException e) {
             LOGGER.debug(e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
