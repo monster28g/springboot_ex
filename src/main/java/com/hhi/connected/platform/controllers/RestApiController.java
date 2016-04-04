@@ -5,6 +5,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
@@ -24,7 +25,7 @@ public class RestApiController {
     public Object getMeasurements(@PathVariable(value="db") String db) {
 
         // TODO add Validator for PathVariable
-        return StringUtils.isEmpty(db) ? new ResponseEntity<>(HttpStatus.BAD_REQUEST) : tsdbHandler.getMeasurements(db);
+        return StringUtils.isEmpty(db) ? new ResponseEntity<>(HttpStatus.BAD_REQUEST) : tsdbHandler.getMeasurements(db, HttpMethod.GET);
 
     }
 
@@ -35,10 +36,9 @@ public class RestApiController {
 
         // TODO add Validator for PathVariable
         LOGGER.debug("query : db= {}, epoch = {}, q = {}", db, epoch, q);
-
         return CollectionUtils.isEmpty(Arrays.asList(db, epoch, q))?
                 new ResponseEntity<>(HttpStatus.BAD_REQUEST)
-                : tsdbHandler.queries(db, epoch, q);
+                : tsdbHandler.queries(db, epoch, q, HttpMethod.GET);
 
     }
 }

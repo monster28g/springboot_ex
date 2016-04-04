@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -42,7 +43,7 @@ public class RestApiControllerTest {
 
     @Test
     public void testGetMeasurements() throws Exception {
-        when(tsdbHandler.getMeasurements(isA(String.class))).thenReturn(String.class);
+        when(tsdbHandler.getMeasurements(isA(String.class), isA(HttpMethod.class))).thenReturn(String.class);
 
         mockMvc.perform(get("/api/query/measurements/{db}", "db")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -52,7 +53,7 @@ public class RestApiControllerTest {
 
     @Test
     public void testQueries() throws Exception {
-        when(tsdbHandler.queries(isA(String.class), isA(String.class), isA(String.class))).thenReturn(String.class);
+        when(tsdbHandler.queries(isA(String.class), isA(String.class), isA(String.class), isA(HttpMethod.class))).thenReturn(String.class);
 
         mockMvc.perform(get("/api/query")
                 .param("db","hivaas")
