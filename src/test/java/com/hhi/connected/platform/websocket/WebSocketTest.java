@@ -122,7 +122,7 @@ public class WebSocketTest {
      * ApplicationContext from the message channels they are subscribed to...
      * except the message handler used to invoke annotated message handling methods.
      * The intent is to reduce additional processing and additional messages not
-     * related to the test.
+     * related to the execute.
      */
     @Configuration
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")

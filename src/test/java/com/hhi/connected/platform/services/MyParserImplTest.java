@@ -1,6 +1,6 @@
 package com.hhi.connected.platform.services;
 
-import com.hhi.connected.platform.handlers.ModelHandler;
+import com.hhi.connected.platform.handlers.ModelHandlerImpl;
 import com.hhi.connected.platform.models.BaseModel;
 import com.hhi.connected.platform.services.utils.ShipTopologyModule;
 import org.apache.commons.io.FileUtils;
@@ -23,7 +23,7 @@ public class MyParserImplTest {
     public void setUp() throws Exception {
         myParser = new MyParserImpl();
         myParser.setShipTopologyModule(new ShipTopologyModule());
-        myParser.setModelHandler(new ModelHandler());
+        myParser.setModelHandler(new ModelHandlerImpl());
         myParser.setCacheDataService(new CacheDataServiceImpl());
     }
 

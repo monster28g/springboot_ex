@@ -13,15 +13,13 @@ import java.net.URISyntaxException;
 @Service
 public class RestApiServiceImpl implements RestApiService{
     private static final Logger LOGGER = LoggerFactory.getLogger(RestApiServiceImpl.class);
-    private static final java.lang.String MEASUMENTS = "http://10.100.16.66:8086/query?pretty=true&q=SHOW+MEASUREMENTS&db=hivaas";
 
     @Override
-    public Object test() {
+    public Object execute(String query) {
         try {
-            return new RestTemplate().getForObject(new URI(MEASUMENTS), String.class);
-
+            return new RestTemplate().getForObject(new URI(query), String.class);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            LOGGER.debug(e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
