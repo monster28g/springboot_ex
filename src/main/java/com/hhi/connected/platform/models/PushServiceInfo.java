@@ -1,5 +1,8 @@
 package com.hhi.connected.platform.models;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class PushServiceInfo {
     
     /** API Endpoints */
@@ -18,28 +21,33 @@ public class PushServiceInfo {
     public static final String passPhrase = "changeit";
 
     public static String getSensorRuleName() {
-//        try {
-//            return String.format("%s-%s",sensorRuleName, InetAddress.getLocalHost().getHostName());
-//        } catch (UnknownHostException e) {
-//            e.printStackTrace();
-//            return sensorRuleName;
-//        }
-        return sensorRuleName;
+        try {
+            return String.format("%s-%s",sensorRuleName, getHostName());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            return sensorRuleName;
+        }
+//        return sensorRuleName;
+    }
+
+    private static String getHostName() throws UnknownHostException {
+        return InetAddress.getLocalHost().getHostName();
+
     }
 
     public static String getAlarmRuleName() {
-//        try {
-//            return String.format("%s-%s",alarmRuleName, InetAddress.getLocalHost().getHostName());
-//        } catch (UnknownHostException e) {
-//            e.printStackTrace();
-//            return alarmRuleName;
-//        }
-        return alarmRuleName;
+        try {
+            return String.format("%s-%s",alarmRuleName, getHostName());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            return alarmRuleName;
+        }
+//        return alarmRuleName;
     }
 
     /** Push rule name which is created beforehand */
-    public static final String sensorRuleName = "sensor001_franky";
+    public static final String sensorRuleName = "sensor";
 
     /** Push rule name which is created beforehand */
-    public static final String alarmRuleName = "alarm001_franky";
+    public static final String alarmRuleName = "alarm";
 }

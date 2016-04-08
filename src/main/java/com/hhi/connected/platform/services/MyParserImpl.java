@@ -125,7 +125,6 @@ public class MyParserImpl implements MyParser{
         return null;
     }
 
-
     public Map.Entry<String, List<BaseModel>> removeSequentialDuplicates(Map.Entry<String, List<BaseModel>> entry) {
 
         List tobeRemoved = new ArrayList<>();
