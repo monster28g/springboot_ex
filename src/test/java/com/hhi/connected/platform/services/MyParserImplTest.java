@@ -1,5 +1,6 @@
 package com.hhi.connected.platform.services;
 
+import com.google.common.collect.ImmutableMap;
 import com.hhi.connected.platform.handlers.ModelHandlerImpl;
 import com.hhi.connected.platform.models.BaseModel;
 import com.hhi.connected.platform.services.utils.ShipTopologyModule;
@@ -29,7 +30,7 @@ public class MyParserImplTest {
 
     @Test
     public void testParse() throws Exception {
-        String message = FileUtils.readFileToString(new File(this.getClass().getResource("/message.json").getFile()));
+        String message = FileUtils.readFileToString(new File(this.getClass().getResource("/data.json").getFile()));
         System.out.println(myParser.parse(message));
         assertNotNull(myParser.parse(message));
         assertNull(myParser.parse(""));
@@ -41,21 +42,21 @@ public class MyParserImplTest {
     public void testRemoveSequentialDuplicates() throws Exception {
 
         Map<String, BaseModel> base = new HashMap<>();
-        base.put("test0", new BaseModel("test0", 10L, 1f, 1));
-        base.put("test1", new BaseModel("test1", 20L, 2f, 1));
+        base.put("test0", new BaseModel("test0", 10L, ImmutableMap.<String, Object>builder().put("value", 1f).put("valid", 1).build()));
+        base.put("test0", new BaseModel("test1", 20L, ImmutableMap.<String, Object>builder().put("value", 2f).put("valid", 1).build()));
         myParser.getCacheDataService().setLatest(base);
 
         Map<String, List<BaseModel>> models = new HashMap<>();
 
         models.put("test0",
                 Arrays.asList(
-                        new BaseModel("test0", 100L, 1f, 1),
-                        new BaseModel("test0", 200L, 1f, 1),
-                        new BaseModel("test0", 300L, 3f, 1),
-                        new BaseModel("test0", 400L, 1f, 1),
-                        new BaseModel("test0", 500L, 5f, 1),
-                        new BaseModel("test0", 600L, 5f, 1),
-                        new BaseModel("test0", 700L, 5f, 1)
+                        new BaseModel("test0", 100L, ImmutableMap.<String, Object>builder().put("value", 1f).put("valid", 1).build()),
+                        new BaseModel("test0", 200L, ImmutableMap.<String, Object>builder().put("value", 1f).put("valid", 1).build()),
+                        new BaseModel("test0", 300L, ImmutableMap.<String, Object>builder().put("value", 3f).put("valid", 1).build()),
+                        new BaseModel("test0", 400L, ImmutableMap.<String, Object>builder().put("value", 2f).put("valid", 1).build()),
+                        new BaseModel("test0", 500L, ImmutableMap.<String, Object>builder().put("value", 5f).put("valid", 1).build()),
+                        new BaseModel("test0", 600L, ImmutableMap.<String, Object>builder().put("value", 5f).put("valid", 1).build()),
+                        new BaseModel("test0", 700L, ImmutableMap.<String, Object>builder().put("value", 5f).put("valid", 1).build())
                 )
         );
 
@@ -69,7 +70,7 @@ public class MyParserImplTest {
 
     private boolean isNotDuplicated(List<BaseModel> list) {
         Set<Float> allItems = new HashSet<>();
-        return list.stream().filter(e -> !allItems.add(e.getValue())).collect(Collectors.toSet()).isEmpty();
+        return list.stream().filter(e -> !allItems.add((Float) e.getValues().get("value"))).collect(Collectors.toSet()).isEmpty();
     }
 
     @Test

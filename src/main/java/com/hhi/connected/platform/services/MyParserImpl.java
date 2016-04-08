@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hhi.connected.platform.handlers.ModelHandler;
 import com.hhi.connected.platform.models.BaseModel;
+import com.hhi.connected.platform.models.enums.ModelType;
 import com.hhi.connected.platform.services.utils.MyListUtils;
 import com.hhi.connected.platform.services.utils.ShipTopologyModule;
 import org.apache.commons.collections4.CollectionUtils;
@@ -24,6 +25,13 @@ import java.util.stream.Stream;
 @Component
 public class MyParserImpl implements MyParser{
     private static final Logger LOGGER = LoggerFactory.getLogger(MyParserImpl.class);
+
+    private static final String VALUE = "value";
+    private static final String VALID = "valid";
+
+    private final static String data = "vdmSampleContent";
+    private final static String alarm = "alarmSampleContent";
+    private final static String config = "shipTopology";
 
     @Autowired
     private ShipTopologyModule shipTopologyModule;
@@ -55,7 +63,12 @@ public class MyParserImpl implements MyParser{
             if(StringUtils.isEmpty(message)){
                 return null;
             }
-            return toJson(shipTopologyModule.refine(new ObjectMapper().readValue(message, new TypeReference<Map<String, Object>>() {})));
+            ModelType type = getModelType(message);
+            if(type == null){
+                return null;
+            }
+
+            return toJson(shipTopologyModule.refine(new ObjectMapper().readValue(message, new TypeReference<Map<String, Object>>() {})), type);
         } catch (IOException e) {
             LOGGER.debug(e.getMessage());
             return null;
@@ -63,9 +76,11 @@ public class MyParserImpl implements MyParser{
 
     }
 
-    private String toJson(Map<String, Object> message) {
+    private String toJson(Map<String, Object> message, ModelType type) {
         try {
-            Map<String, List<BaseModel>> sorted = modelHandler.process(message).stream().collect(Collectors.groupingBy(BaseModel::getKey));
+
+
+            Map<String, List<BaseModel>> sorted = modelHandler.process(message, type).stream().collect(Collectors.groupingBy(BaseModel::getKey));
 
             if(MapUtils.isEmpty(sorted))
             {
@@ -82,6 +97,32 @@ public class MyParserImpl implements MyParser{
             LOGGER.debug(e.getMessage());
             return null;
         }
+    }
+
+    private ModelType getModelType(Map<String, Object> payload) {
+
+        // TODO do this with enum value(int -> String)
+        if(payload.get(data) != null){
+            return ModelType.DATA;
+        } else if(payload.get(alarm) != null){
+            return ModelType.ALARM;
+        } else if(payload.get(config) != null){
+            return ModelType.CONFIG;
+        }
+        return null;
+    }
+
+    private ModelType getModelType(String payload) {
+
+        // TODO do this with enum value(int -> String)
+        if(payload.contains(data)){
+            return ModelType.DATA;
+        } else if(payload.contains(alarm)){
+            return ModelType.ALARM;
+        } else if(payload.contains(config)){
+            return ModelType.CONFIG;
+        }
+        return null;
     }
 
 
@@ -119,7 +160,7 @@ public class MyParserImpl implements MyParser{
     }
 
     private boolean isSequentiallyDuplicated(List<BaseModel> e, int i) {
-        return e.get(i).getValue().equals(e.get(i - 1).getValue());
+        return e.get(i).getValues().get(VALUE).equals(e.get(i - 1).getValues().get(VALUE));
     }
 
     private Function<Map.Entry<String, List<BaseModel>>, Map> convertListToSingleStringFunction() {
@@ -127,7 +168,7 @@ public class MyParserImpl implements MyParser{
                 new AbstractMap.SimpleEntry<>(
                         e.getKey(),
                         e.getValue()
-                                .stream().map(m -> Arrays.asList(m.getTimestamp(), m.getValue(), m.getValid())).flatMap(Collection::stream).collect(Collectors.toList()))
+                                .stream().map(m -> Arrays.asList(m.getTimestamp(), m.getValues().get(VALUE), m.getValues().get(VALID))).flatMap(Collection::stream).collect(Collectors.toList()))
         ).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue)));
     }
 

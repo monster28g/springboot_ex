@@ -1,6 +1,8 @@
 package com.hhi.connected.platform.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hhi.connected.platform.models.APIInfo;
 import com.hhi.connected.platform.models.Greeting;
 import com.hhi.connected.platform.models.PushServiceInfo;
@@ -23,6 +25,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.security.KeyStore;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class PushServiceImpl implements PushService{
@@ -66,8 +70,8 @@ public class PushServiceImpl implements PushService{
 
     private void init() throws Exception {
         if(registerSoftware()){
-            deleteSensorEventRules(PushServiceInfo.sensorRuleName);
-            deleteAlarmEventRules(PushServiceInfo.alarmRuleName);
+            deleteSensorEventRules(PushServiceInfo.getSensorRuleName());
+            deleteAlarmEventRules(PushServiceInfo.getAlarmRuleName());
         }
     }
 
@@ -135,7 +139,7 @@ public class PushServiceImpl implements PushService{
             LOGGER.debug("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
 
             // 3. Get event data using WebScoket
-            getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/sensor", PushServiceInfo.sensorRuleName);
+            getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/sensor", PushServiceInfo.getSensorRuleName());
         } else {
             LOGGER.debug("create EventRule has failed");
             init();
@@ -152,7 +156,7 @@ public class PushServiceImpl implements PushService{
             LOGGER.debug("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
 
             // 3. Get event data using WebScoket
-            getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/alarm", PushServiceInfo.alarmRuleName);
+            getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/alarm", PushServiceInfo.getAlarmRuleName());
         }
     }
 
@@ -179,15 +183,21 @@ public class PushServiceImpl implements PushService{
             @Override
             public void handleMessageEvent(String msg) {
 
+
                 /** describe something to do */
-                LOGGER.trace("Received Message via WebSocket : " + msg);
+                LOGGER.debug("Received Message via WebSocket : {}", ruleName);
+                LOGGER.trace("Received Message via WebSocket : {}", msg);
 
                 if(template != null) {
                     String payload = myParser.parse(msg);
 
                     if(!(StringUtils.isEmpty(payload))) {
                         LOGGER.trace("Sent Message via WebSocket : " + payload);
-                        template.convertAndSend(DESTINATION, new Greeting(0L, payload));
+                        try {
+                            template.convertAndSend(DESTINATION, new Greeting(0L, addKey(ruleName, payload)));
+                        } catch (JsonProcessingException e) {
+                            LOGGER.debug(e.getMessage());
+                        }
                     }
                 }
 
@@ -200,7 +210,7 @@ public class PushServiceImpl implements PushService{
                 /** describe something to do */
                 LOGGER.debug("Status Code : " + statusCode + ", Reason : " + reason);
                 try {
-                    deleteSensorEventRules(PushServiceInfo.sensorRuleName);
+                    deleteSensorEventRules(PushServiceInfo.getSensorRuleName());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -220,6 +230,23 @@ public class PushServiceImpl implements PushService{
          * Thread will not be stopped. If you want to stop the websocketClient thread, invoke close() manually.
          * {@link com.hhi.vaas.platform.sample.SampleAPIGatewayClient#closeWebSocket()}.
          */
+    }
+
+    private final static String data = "vdmSampleContent";
+    private final static String alarm = "alarmSampleContent";
+
+    private String addKey(String ruleName, String payload) throws JsonProcessingException {
+
+        Map map = new HashMap<>();
+
+        if(ruleName.equals(PushServiceInfo.getSensorRuleName())){
+            map.put(data, payload);
+
+        }else if(ruleName.equals(PushServiceInfo.getAlarmRuleName())){
+            map.put(alarm, payload);
+        }
+
+        return new ObjectMapper().writeValueAsString(map);
     }
 
     /**
@@ -280,7 +307,7 @@ public class PushServiceImpl implements PushService{
 
         Integer timeWindow = 1;
 
-        return createRule(PushServiceInfo.cepApiUrl + "/createSensorRule", fullPaths, timeWindow, PushServiceInfo.sensorRuleName);
+        return createRule(PushServiceInfo.cepApiUrl + "/createSensorRule", fullPaths, timeWindow, PushServiceInfo.getSensorRuleName());
         
     }
 
@@ -289,7 +316,7 @@ public class PushServiceImpl implements PushService{
         String fullPaths = "*";
         Integer timeWindow = 2;
 
-        return createRule(PushServiceInfo.cepApiUrl + "/createAlarmRule", fullPaths, timeWindow, PushServiceInfo.alarmRuleName);
+        return createRule(PushServiceInfo.cepApiUrl + "/createAlarmRule", fullPaths, timeWindow, PushServiceInfo.getAlarmRuleName());
     }
 
     private boolean createRule(String apiUrl, String fullPaths, Integer timeWindow, String ruleName) throws Exception {

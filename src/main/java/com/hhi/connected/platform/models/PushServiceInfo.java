@@ -17,9 +17,29 @@ public class PushServiceInfo {
     public static final String keyFileName = "hhivaasdev3_privateKey.key";
     public static final String passPhrase = "changeit";
 
-    /** Push rule name which is created beforehand */
-    public static final String sensorRuleName = "sensor001";
+    public static String getSensorRuleName() {
+//        try {
+//            return String.format("%s-%s",sensorRuleName, InetAddress.getLocalHost().getHostName());
+//        } catch (UnknownHostException e) {
+//            e.printStackTrace();
+//            return sensorRuleName;
+//        }
+        return sensorRuleName;
+    }
+
+    public static String getAlarmRuleName() {
+//        try {
+//            return String.format("%s-%s",alarmRuleName, InetAddress.getLocalHost().getHostName());
+//        } catch (UnknownHostException e) {
+//            e.printStackTrace();
+//            return alarmRuleName;
+//        }
+        return alarmRuleName;
+    }
 
     /** Push rule name which is created beforehand */
-    public static final String alarmRuleName = "alarm001";
+    public static final String sensorRuleName = "sensor001_franky";
+
+    /** Push rule name which is created beforehand */
+    public static final String alarmRuleName = "alarm001_franky";
 }
