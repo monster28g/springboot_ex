@@ -2,6 +2,8 @@ package com.hhi.connected.platform.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hhi.connected.platform.models.HelloMessage;
+import com.hhi.connected.platform.models.PushServiceInfo;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,11 +32,14 @@ import org.springframework.web.socket.config.annotation.AbstractWebSocketMessage
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
@@ -89,7 +94,42 @@ public class WebSocketTest {
         assertEquals("/topic/greetings", replyHeaders.getDestination());
 
         String json = new String((byte[]) reply.getPayload(), Charset.forName("UTF-8"));
-        new JsonPathExpectationsHelper("$.content").assertValue(json, String.format("Hello, WS, %s!!", name));
+        new JsonPathExpectationsHelper("$.content").assertValue(json, String.format("Hello, WS echo, DELL!!", name));
+    }
+
+    @Test
+    public void testPushData() throws Exception {
+
+        String name = PushServiceInfo.getSensorRuleName();
+
+        HelloMessage helloMessage = new HelloMessage();
+        helloMessage.setName(name);
+        helloMessage.setBody(getMessagesAsString("/data.json"));
+
+        byte[] payload = new ObjectMapper().writeValueAsBytes(helloMessage);
+
+        StompHeaderAccessor headers = StompHeaderAccessor.create(StompCommand.SEND);
+        headers.setDestination("/app/hello");
+        headers.setSessionId("0");
+        headers.setSessionAttributes(new HashMap<>());
+        Message<byte[]> message = MessageBuilder.createMessage(payload, headers.getMessageHeaders());
+
+        this.brokerChannelInterceptor.setIncludedDestinations("/topic/**");
+        this.clientInboundChannel.send(message);
+
+        Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
+        Assert.assertNotNull(reply);
+
+        StompHeaderAccessor replyHeaders = StompHeaderAccessor.wrap(reply);
+        assertEquals("0", replyHeaders.getSessionId());
+        assertEquals("/topic/greetings", replyHeaders.getDestination());
+
+        String json = new String((byte[]) reply.getPayload(), Charset.forName("UTF-8"));
+        assertTrue(json.contains("vdmSampleContent") || json.contains("alarmSampleContent"));
+    }
+
+    private String getMessagesAsString(String s) throws IOException {
+        return FileUtils.readFileToString(new File(this.getClass().getResource(s).getFile()));
     }
 
     @Configuration
@@ -122,7 +162,7 @@ public class WebSocketTest {
      * ApplicationContext from the message channels they are subscribed to...
      * except the message handler used to invoke annotated message handling methods.
      * The intent is to reduce additional processing and additional messages not
-     * related to the test.
+     * related to the execute.
      */
     @Configuration
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")

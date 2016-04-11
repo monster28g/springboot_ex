@@ -3,6 +3,7 @@ package com.hhi.connected.platform.controllers;
 import com.hhi.connected.platform.models.HelloMessage;
 import com.hhi.connected.platform.services.MyService;
 import com.hhi.connected.platform.services.PushService;
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,13 +49,15 @@ public class GreetingController {
     @MessageMapping("/hello")
     @SendTo("/topic/greetings")
     public Object hello(HelloMessage message) {
-        return myService.sayHello("WS, " + message.getName() + "!");
+        return StringUtils.isEmpty(message.getBody())?
+                myService.sayHello("WS echo, " + message.getName() + "!")
+                : myService.home(message.getName(), message.getBody());
     }
 
     @PostConstruct
     private void broadcastTimePeriodically() {
-        scheduler.scheduleAtFixedRate((Runnable) this::tictoc, 60000L);
-        scheduler.scheduleAtFixedRate((Runnable) this::keepAlivePushService, 60000L);
+        scheduler.scheduleAtFixedRate(this::tictoc, 60000L);
+        scheduler.scheduleAtFixedRate(this::keepAlivePushService, 60000L);
 
     }
 

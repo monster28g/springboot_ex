@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.hhi.connected.platform.models.APIInfo;
 import com.hhi.connected.platform.models.Greeting;
 import com.hhi.connected.platform.models.PushServiceInfo;
+import com.hhi.connected.platform.models.enums.ModelType;
 import com.hhi.connected.platform.services.utils.RegisterUtil;
 import com.hhi.vaas.platform.middleware.client.rest.APIGatewayClient;
 import com.hhi.vaas.platform.middleware.client.websocket.EventHandler;
@@ -53,15 +54,21 @@ public class PushServiceImpl implements PushService{
         run();
     }
 
+    @Override
+    public void reStart() throws Exception {
+        init();
+        run();
+    }
+
     private void run() throws Exception {
         startSensor();
-//        startAlarm();
+        startAlarm();
     }
 
     private void init() throws Exception {
         if(registerSoftware()){
-            deleteSensorEventRules(PushServiceInfo.sensorRuleName);
-            deleteAlarmEventRules(PushServiceInfo.alarmRuleName);
+            deleteSensorEventRules(PushServiceInfo.getSensorRuleName());
+            deleteAlarmEventRules(PushServiceInfo.getAlarmRuleName());
         }
     }
 
@@ -129,9 +136,9 @@ public class PushServiceImpl implements PushService{
             LOGGER.debug("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
 
             // 3. Get event data using WebScoket
-            getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/sensor", PushServiceInfo.sensorRuleName);
+            getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/sensor", PushServiceInfo.getSensorRuleName());
         } else {
-            LOGGER.debug("create EventRule has failed");
+            LOGGER.debug("create SensorEventRule has failed");
             init();
         }
     }
@@ -141,18 +148,15 @@ public class PushServiceImpl implements PushService{
         return this.websocketClient != null && this.websocketClient.isAlive();
     }
 
-    @Override
-    public void reStart() throws Exception {
-        init();
-        run();
-    }
-
     public void startAlarm() throws Exception{
         if (createAlarmEventRule()) {
             LOGGER.debug("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
 
             // 3. Get event data using WebScoket
-            getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/alarm", PushServiceInfo.alarmRuleName);
+            getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/alarm", PushServiceInfo.getAlarmRuleName());
+        }else {
+            LOGGER.debug("create AlarmEventRule has failed");
+            init();
         }
     }
 
@@ -180,16 +184,17 @@ public class PushServiceImpl implements PushService{
             public void handleMessageEvent(String msg) {
 
                 /** describe something to do */
-                LOGGER.trace("Received Message via WebSocket : " + msg);
+                LOGGER.trace("Received Message via WebSocket : {}, {}", ruleName, msg);
 
                 if(template != null) {
-                    String payload = myParser.parse(msg);
+                    String payload = myParser.parse(msg, getType(ruleName));
 
                     if(!(StringUtils.isEmpty(payload))) {
                         LOGGER.trace("Sent Message via WebSocket : " + payload);
+
                         template.convertAndSend(DESTINATION, new Greeting(0L, payload));
                     }
-                }
+            }
 
                 /** in case of ackMode is enable, invoke sendAck or sendNack to receive next message */
                 sendAck();// sendNack();
@@ -200,7 +205,7 @@ public class PushServiceImpl implements PushService{
                 /** describe something to do */
                 LOGGER.debug("Status Code : " + statusCode + ", Reason : " + reason);
                 try {
-                    deleteSensorEventRules(PushServiceInfo.sensorRuleName);
+                    deleteSensorEventRules(ruleName);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -221,6 +226,12 @@ public class PushServiceImpl implements PushService{
          * {@link com.hhi.vaas.platform.sample.SampleAPIGatewayClient#closeWebSocket()}.
          */
     }
+
+    private ModelType getType(String ruleName) {
+        return ruleName.equals(PushServiceInfo.getSensorRuleName())? ModelType.DATA : ruleName.equals(PushServiceInfo.getAlarmRuleName())?ModelType.ALARM:null;
+    }
+
+
 
     /**
      * Delete a CEP vdm sensor event rule for 3rd party
@@ -280,7 +291,7 @@ public class PushServiceImpl implements PushService{
 
         Integer timeWindow = 1;
 
-        return createRule(PushServiceInfo.cepApiUrl + "/createSensorRule", fullPaths, timeWindow, PushServiceInfo.sensorRuleName);
+        return createRule(PushServiceInfo.cepApiUrl + "/createSensorRule", fullPaths, timeWindow, PushServiceInfo.getSensorRuleName());
         
     }
 
@@ -289,7 +300,7 @@ public class PushServiceImpl implements PushService{
         String fullPaths = "*";
         Integer timeWindow = 2;
 
-        return createRule(PushServiceInfo.cepApiUrl + "/createAlarmRule", fullPaths, timeWindow, PushServiceInfo.alarmRuleName);
+        return createRule(PushServiceInfo.cepApiUrl + "/createAlarmRule", fullPaths, timeWindow, PushServiceInfo.getAlarmRuleName());
     }
 
     private boolean createRule(String apiUrl, String fullPaths, Integer timeWindow, String ruleName) throws Exception {

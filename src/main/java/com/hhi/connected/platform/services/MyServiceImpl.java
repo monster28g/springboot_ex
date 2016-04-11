@@ -19,9 +19,9 @@ public class MyServiceImpl implements MyService {
     }
 
     @Override
-    public Greeting home() {
+    public Object home(String ruleName, String body) {
 
-        return new Greeting(0L, "none");
+        return new Greeting(0L, body);
     }
 
     @Override

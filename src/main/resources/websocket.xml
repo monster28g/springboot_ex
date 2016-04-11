@@ -8,8 +8,8 @@
         http://www.springframework.org/schema/websocket/spring-websocket.xsd">
 
     <!-- fixme, causes "http://localhost:18080/hello/info 404 (Not Found)"-->
-    <websocket:message-broker application-destination-prefix="/app">
-        <websocket:stomp-endpoint path="/hello" />
-        <websocket:simple-broker prefix="/topic" />
-    </websocket:message-broker>
+    <!--<websocket:message-broker application-destination-prefix="/app">-->
+        <!--<websocket:stomp-endpoint path="/hello" />-->
+        <!--<websocket:simple-broker prefix="/topic" />-->
+    <!--</websocket:message-broker>-->
 </beans>

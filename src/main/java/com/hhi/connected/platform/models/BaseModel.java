@@ -1,16 +1,16 @@
 package com.hhi.connected.platform.models;
 
+import java.util.Map;
+
 public class BaseModel {
     private String key;
-    private Float value;
     private Long timestamp;
-    private Integer valid;
+    private Map<String, Object> values;
 
-    public BaseModel(String key, Long timestamp, Float value, Integer valid) {
+    public BaseModel(String key, Long timestamp, Map<String, Object> values) {
         this.key = key;
-        this.value = value;
         this.timestamp = timestamp;
-        this.valid = valid;
+        this.values = values;
     }
 
     public String getKey() {
@@ -20,13 +20,6 @@ public class BaseModel {
         this.key = key;
     }
 
-    public Float getValue() {
-        return value;
-    }
-    public void setValue(Float value) {
-        this.value = value;
-    }
-
     public Long getTimestamp() {
         return timestamp;
     }
@@ -34,10 +27,10 @@ public class BaseModel {
         this.timestamp = timestamp;
     }
 
-    public Integer getValid() {
-        return valid;
+    public Map<String, Object> getValues() {
+        return values;
     }
-    public void setValid(Integer valid) {
-        this.valid = valid;
+    public void setValues(Map<String, Object> values) {
+        this.values = values;
     }
 }

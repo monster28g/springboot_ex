@@ -1,5 +1,8 @@
 package com.hhi.connected.platform.models;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class PushServiceInfo {
     
     /** API Endpoints */
@@ -16,6 +19,33 @@ public class PushServiceInfo {
     public static final String jksFileName = "hhivaasdev3.jks";
     public static final String keyFileName = "hhivaasdev3_privateKey.key";
     public static final String passPhrase = "changeit";
+
+    public static String getSensorRuleName() {
+
+//        try {
+//            return String.format("%s-%s",sensorRuleName, getHostName());
+//        } catch (UnknownHostException e) {
+//            e.printStackTrace();
+//            return sensorRuleName;
+//        }
+        return sensorRuleName;
+    }
+
+    private static String getHostName() throws UnknownHostException {
+        // FIXME CEP rule register problem with hostname
+        return InetAddress.getLocalHost().getHostName();
+
+    }
+
+    public static String getAlarmRuleName() {
+//        try {
+//            return String.format("%s-%s",alarmRuleName, getHostName());
+//        } catch (UnknownHostException e) {
+//            e.printStackTrace();
+//            return alarmRuleName;
+//        }
+        return alarmRuleName;
+    }
 
     /** Push rule name which is created beforehand */
     public static final String sensorRuleName = "sensor001";

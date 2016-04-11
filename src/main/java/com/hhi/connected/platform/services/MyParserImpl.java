@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hhi.connected.platform.handlers.ModelHandler;
 import com.hhi.connected.platform.models.BaseModel;
+import com.hhi.connected.platform.models.enums.ModelType;
 import com.hhi.connected.platform.services.utils.MyListUtils;
 import com.hhi.connected.platform.services.utils.ShipTopologyModule;
 import org.apache.commons.collections4.CollectionUtils;
@@ -24,6 +25,13 @@ import java.util.stream.Stream;
 @Component
 public class MyParserImpl implements MyParser{
     private static final Logger LOGGER = LoggerFactory.getLogger(MyParserImpl.class);
+
+    private static final String VALUE = "value";
+    private static final String VALID = "valid";
+
+    private final static String DATA_KEY = "vdmSampleContent";
+    private final static String ALARM_KEY = "alarmSampleContent";
+    private final static String config = "shipTopology";
 
     @Autowired
     private ShipTopologyModule shipTopologyModule;
@@ -50,22 +58,32 @@ public class MyParserImpl implements MyParser{
     }
 
     @Override
-    public String parse(String message) {
+    public String parse(String message, ModelType type) {
+        String result = "";
         try {
-            if(StringUtils.isEmpty(message)){
+            if(StringUtils.isEmpty(message) || type == null){
                 return null;
             }
-            return toJson(shipTopologyModule.refine(new ObjectMapper().readValue(message, new TypeReference<Map<String, Object>>() {})));
+            if(type.equals(ModelType.DATA)) {
+                result = toJson(shipTopologyModule.refine(new ObjectMapper().readValue(message, new TypeReference<Map<String, Object>>() {})), type);
+            }else if(type.equals(ModelType.ALARM)) {
+                result = String.format("{\"%s\":%s}", supplier.apply(type), message);
+            }
+
         } catch (IOException e) {
             LOGGER.debug(e.getMessage());
             return null;
         }
-
+        return result;
     }
 
-    private String toJson(Map<String, Object> message) {
+    Function<ModelType, String> supplier = (t) -> t.equals(ModelType.DATA) ? DATA_KEY : t.equals(ModelType.ALARM) ? ALARM_KEY : null;
+
+    private String toJson(Map<String, Object> message, ModelType type) {
         try {
-            Map<String, List<BaseModel>> sorted = modelHandler.process(message).stream().collect(Collectors.groupingBy(BaseModel::getKey));
+
+
+            Map<String, List<BaseModel>> sorted = modelHandler.process(message, type).stream().collect(Collectors.groupingBy(BaseModel::getKey));
 
             if(MapUtils.isEmpty(sorted))
             {
@@ -76,7 +94,7 @@ public class MyParserImpl implements MyParser{
             // TODO need to bulk process for only getting data from the cache but also updating latest data to the cache
             List result = sorted.entrySet().stream().map(this::removeSequentialDuplicates).filter(e -> !e.getValue().isEmpty()).map(convertListToSingleStringFunction()).collect(Collectors.toList());
 
-            return CollectionUtils.isEmpty(result) ? null : new ObjectMapper().writeValueAsString(result);
+            return CollectionUtils.isEmpty(result) ? null : addKey(result, supplier.apply(type));
 
         } catch (JsonProcessingException e) {
             LOGGER.debug(e.getMessage());
@@ -84,6 +102,39 @@ public class MyParserImpl implements MyParser{
         }
     }
 
+    private String addKey(List payload, final String key) throws JsonProcessingException {
+
+        Map<String, Object> map = new HashMap<>();
+        map.put(key, payload);
+        return new ObjectMapper().writeValueAsString(map);
+
+    }
+
+    private ModelType getModelType(Map<String, Object> payload) {
+
+        // TODO do this with enum value(int -> String)
+        if(payload.get(DATA_KEY) != null){
+            return ModelType.DATA;
+        } else if(payload.get(ALARM_KEY) != null){
+            return ModelType.ALARM;
+        } else if(payload.get(config) != null){
+            return ModelType.CONFIG;
+        }
+        return null;
+    }
+
+    private ModelType getModelType(String payload) {
+
+        // TODO do this with enum value(int -> String)
+        if(payload.contains(DATA_KEY)){
+            return ModelType.DATA;
+        } else if(payload.contains(ALARM_KEY)){
+            return ModelType.ALARM;
+        } else if(payload.contains(config)){
+            return ModelType.CONFIG;
+        }
+        return null;
+    }
 
     public Map.Entry<String, List<BaseModel>> removeSequentialDuplicates(Map.Entry<String, List<BaseModel>> entry) {
 
@@ -119,7 +170,7 @@ public class MyParserImpl implements MyParser{
     }
 
     private boolean isSequentiallyDuplicated(List<BaseModel> e, int i) {
-        return e.get(i).getValue().equals(e.get(i - 1).getValue());
+        return e.get(i).getValues().get(VALUE).equals(e.get(i - 1).getValues().get(VALUE));
     }
 
     private Function<Map.Entry<String, List<BaseModel>>, Map> convertListToSingleStringFunction() {
@@ -127,7 +178,7 @@ public class MyParserImpl implements MyParser{
                 new AbstractMap.SimpleEntry<>(
                         e.getKey(),
                         e.getValue()
-                                .stream().map(m -> Arrays.asList(m.getTimestamp(), m.getValue(), m.getValid())).flatMap(Collection::stream).collect(Collectors.toList()))
+                                .stream().map(m -> Arrays.asList(m.getTimestamp(), m.getValues().get(VALUE), m.getValues().get(VALID))).flatMap(Collection::stream).collect(Collectors.toList()))
         ).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue)));
     }
 
