@@ -19,7 +19,6 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,18 +59,25 @@ public class MyParserImpl implements MyParser{
 
     @Override
     public String parse(String message, ModelType type) {
+        String result = "";
         try {
             if(StringUtils.isEmpty(message) || type == null){
                 return null;
             }
+            if(type.equals(ModelType.DATA)) {
+                result = toJson(shipTopologyModule.refine(new ObjectMapper().readValue(message, new TypeReference<Map<String, Object>>() {})), type);
+            }else if(type.equals(ModelType.ALARM)) {
+                result = String.format("{\"%s\":%s}", supplier.apply(type), message);
+            }
 
-            return toJson(shipTopologyModule.refine(new ObjectMapper().readValue(message, new TypeReference<Map<String, Object>>() {})), type);
         } catch (IOException e) {
             LOGGER.debug(e.getMessage());
             return null;
         }
-
+        return result;
     }
+
+    Function<ModelType, String> supplier = (t) -> t.equals(ModelType.DATA) ? DATA_KEY : t.equals(ModelType.ALARM) ? ALARM_KEY : null;
 
     private String toJson(Map<String, Object> message, ModelType type) {
         try {
@@ -86,10 +92,9 @@ public class MyParserImpl implements MyParser{
             }
 
             // TODO need to bulk process for only getting data from the cache but also updating latest data to the cache
-            Supplier<String> supplier = () -> type.equals(ModelType.DATA) ? DATA_KEY : type.equals(ModelType.ALARM) ? ALARM_KEY : null;
             List result = sorted.entrySet().stream().map(this::removeSequentialDuplicates).filter(e -> !e.getValue().isEmpty()).map(convertListToSingleStringFunction()).collect(Collectors.toList());
 
-            return CollectionUtils.isEmpty(result) ? null : addKey(result, supplier.get());
+            return CollectionUtils.isEmpty(result) ? null : addKey(result, supplier.apply(type));
 
         } catch (JsonProcessingException e) {
             LOGGER.debug(e.getMessage());

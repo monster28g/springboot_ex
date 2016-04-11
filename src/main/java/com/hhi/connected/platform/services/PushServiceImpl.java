@@ -62,7 +62,7 @@ public class PushServiceImpl implements PushService{
 
     private void run() throws Exception {
         startSensor();
-//        startAlarm();
+        startAlarm();
     }
 
     private void init() throws Exception {
@@ -138,7 +138,7 @@ public class PushServiceImpl implements PushService{
             // 3. Get event data using WebScoket
             getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/sensor", PushServiceInfo.getSensorRuleName());
         } else {
-            LOGGER.debug("create EventRule has failed");
+            LOGGER.debug("create SensorEventRule has failed");
             init();
         }
     }
@@ -154,6 +154,9 @@ public class PushServiceImpl implements PushService{
 
             // 3. Get event data using WebScoket
             getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/alarm", PushServiceInfo.getAlarmRuleName());
+        }else {
+            LOGGER.debug("create AlarmEventRule has failed");
+            init();
         }
     }
 
@@ -202,7 +205,7 @@ public class PushServiceImpl implements PushService{
                 /** describe something to do */
                 LOGGER.debug("Status Code : " + statusCode + ", Reason : " + reason);
                 try {
-                    deleteSensorEventRules(PushServiceInfo.getSensorRuleName());
+                    deleteSensorEventRules(ruleName);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
