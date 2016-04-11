@@ -1,11 +1,10 @@
 package com.hhi.connected.platform.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hhi.connected.platform.models.APIInfo;
 import com.hhi.connected.platform.models.Greeting;
 import com.hhi.connected.platform.models.PushServiceInfo;
+import com.hhi.connected.platform.models.enums.ModelType;
 import com.hhi.connected.platform.services.utils.RegisterUtil;
 import com.hhi.vaas.platform.middleware.client.rest.APIGatewayClient;
 import com.hhi.vaas.platform.middleware.client.websocket.EventHandler;
@@ -25,8 +24,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.security.KeyStore;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class PushServiceImpl implements PushService{
@@ -183,23 +180,18 @@ public class PushServiceImpl implements PushService{
             @Override
             public void handleMessageEvent(String msg) {
 
-
                 /** describe something to do */
-                LOGGER.debug("Received Message via WebSocket : {}", ruleName);
-                LOGGER.trace("Received Message via WebSocket : {}", msg);
+                LOGGER.trace("Received Message via WebSocket : {}, {}", ruleName, msg);
 
                 if(template != null) {
-                    String payload = myParser.parse(msg);
+                    String payload = myParser.parse(msg, getType(ruleName));
 
                     if(!(StringUtils.isEmpty(payload))) {
                         LOGGER.trace("Sent Message via WebSocket : " + payload);
-                        try {
-                            template.convertAndSend(DESTINATION, new Greeting(0L, addKey(ruleName, payload)));
-                        } catch (JsonProcessingException e) {
-                            LOGGER.debug(e.getMessage());
-                        }
+
+                        template.convertAndSend(DESTINATION, new Greeting(0L, payload));
                     }
-                }
+            }
 
                 /** in case of ackMode is enable, invoke sendAck or sendNack to receive next message */
                 sendAck();// sendNack();
@@ -232,22 +224,11 @@ public class PushServiceImpl implements PushService{
          */
     }
 
-    private final static String data = "vdmSampleContent";
-    private final static String alarm = "alarmSampleContent";
-
-    private String addKey(String ruleName, String payload) throws JsonProcessingException {
-
-        Map map = new HashMap<>();
-
-        if(ruleName.equals(PushServiceInfo.getSensorRuleName())){
-            map.put(data, payload);
-
-        }else if(ruleName.equals(PushServiceInfo.getAlarmRuleName())){
-            map.put(alarm, payload);
-        }
-
-        return new ObjectMapper().writeValueAsString(map);
+    private ModelType getType(String ruleName) {
+        return ruleName.equals(PushServiceInfo.getSensorRuleName())? ModelType.DATA : ruleName.equals(PushServiceInfo.getAlarmRuleName())?ModelType.ALARM:null;
     }
+
+
 
     /**
      * Delete a CEP vdm sensor event rule for 3rd party

@@ -3,6 +3,7 @@ package com.hhi.connected.platform.services;
 import com.google.common.collect.ImmutableMap;
 import com.hhi.connected.platform.handlers.ModelHandlerImpl;
 import com.hhi.connected.platform.models.BaseModel;
+import com.hhi.connected.platform.models.enums.ModelType;
 import com.hhi.connected.platform.services.utils.ShipTopologyModule;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -31,10 +32,10 @@ public class MyParserImplTest {
     @Test
     public void testParse() throws Exception {
         String message = FileUtils.readFileToString(new File(this.getClass().getResource("/data.json").getFile()));
-        System.out.println(myParser.parse(message));
-        assertNotNull(myParser.parse(message));
-        assertNull(myParser.parse(""));
-        assertNull(myParser.parse(null));
+        System.out.println(myParser.parse(message, ModelType.DATA));
+        assertNotNull(myParser.parse(message, ModelType.DATA));
+        assertNull(myParser.parse("", null));
+        assertNull(myParser.parse(null, null));
 
     }
 

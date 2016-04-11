@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,8 +30,8 @@ public class MyParserImpl implements MyParser{
     private static final String VALUE = "value";
     private static final String VALID = "valid";
 
-    private final static String data = "vdmSampleContent";
-    private final static String alarm = "alarmSampleContent";
+    private final static String DATA_KEY = "vdmSampleContent";
+    private final static String ALARM_KEY = "alarmSampleContent";
     private final static String config = "shipTopology";
 
     @Autowired
@@ -58,13 +59,9 @@ public class MyParserImpl implements MyParser{
     }
 
     @Override
-    public String parse(String message) {
+    public String parse(String message, ModelType type) {
         try {
-            if(StringUtils.isEmpty(message)){
-                return null;
-            }
-            ModelType type = getModelType(message);
-            if(type == null){
+            if(StringUtils.isEmpty(message) || type == null){
                 return null;
             }
 
@@ -89,9 +86,10 @@ public class MyParserImpl implements MyParser{
             }
 
             // TODO need to bulk process for only getting data from the cache but also updating latest data to the cache
+            Supplier<String> supplier = () -> type.equals(ModelType.DATA) ? DATA_KEY : type.equals(ModelType.ALARM) ? ALARM_KEY : null;
             List result = sorted.entrySet().stream().map(this::removeSequentialDuplicates).filter(e -> !e.getValue().isEmpty()).map(convertListToSingleStringFunction()).collect(Collectors.toList());
 
-            return CollectionUtils.isEmpty(result) ? null : new ObjectMapper().writeValueAsString(result);
+            return CollectionUtils.isEmpty(result) ? null : addKey(result, supplier.get());
 
         } catch (JsonProcessingException e) {
             LOGGER.debug(e.getMessage());
@@ -99,12 +97,20 @@ public class MyParserImpl implements MyParser{
         }
     }
 
+    private String addKey(List payload, final String key) throws JsonProcessingException {
+
+        Map<String, Object> map = new HashMap<>();
+        map.put(key, payload);
+        return new ObjectMapper().writeValueAsString(map);
+
+    }
+
     private ModelType getModelType(Map<String, Object> payload) {
 
         // TODO do this with enum value(int -> String)
-        if(payload.get(data) != null){
+        if(payload.get(DATA_KEY) != null){
             return ModelType.DATA;
-        } else if(payload.get(alarm) != null){
+        } else if(payload.get(ALARM_KEY) != null){
             return ModelType.ALARM;
         } else if(payload.get(config) != null){
             return ModelType.CONFIG;
@@ -115,9 +121,9 @@ public class MyParserImpl implements MyParser{
     private ModelType getModelType(String payload) {
 
         // TODO do this with enum value(int -> String)
-        if(payload.contains(data)){
+        if(payload.contains(DATA_KEY)){
             return ModelType.DATA;
-        } else if(payload.contains(alarm)){
+        } else if(payload.contains(ALARM_KEY)){
             return ModelType.ALARM;
         } else if(payload.contains(config)){
             return ModelType.CONFIG;
