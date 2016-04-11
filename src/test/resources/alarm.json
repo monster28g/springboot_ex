@@ -1,0 +1,88 @@
+{
+  "alarmSampleContent":[
+    {
+      "vdmpath":"Mechanical/Machinery/DieselEngine/MainEngine1/MainLOPump1.Mode.abnormal.stVal",
+      "desc":"NO.1 MAIN L.O P/P ABNORMAL",
+      "signalType":"DIGITAL",
+      "alarmType":"ALARM",
+      "alarmLevel":"AL",
+      "status":"ALM",
+      "alarmTime":1450494479000,
+      "ackTime":null,
+      "normalTime":null,
+      "instVal":"OFF"
+    },
+    {
+      "vdmpath":"Mechanical/Pressurized/Boiler1/CircPump1.Mode.abnormal.stVal",
+      "desc":"NO.1 BLR W.CIRC P/P ABNORMAL",
+      "signalType":"DIGITAL",
+      "alarmType":"ALARM",
+      "alarmLevel":"AL",
+      "status":"ACK",
+      "alarmTime":1450494480000,
+      "ackTime":1450494483000,
+      "normalTime":null,
+      "instVal":"OFF"
+    },
+    {
+      "vdmpath":"Mechanical/Pressurized/Boiler1/AuxBoiler1.Steam1.Pressure.val",
+      "desc":"BOILER STEAM PRESS",
+      "signalType":"ANALOG",
+      "alarmType":"ALARM",
+      "alarmLevel":"LO",
+      "status":"ALM",
+      "alarmTime":1450494657000,
+      "ackTime":null,
+      "normalTime":null,
+      "instVal":"5.50"
+    },
+    {
+      "vdmpath":"Mechanical/Pressurized/Boiler1/AuxBoiler1.Mode.abnormal.stVal",
+      "desc":"BOILER COMMON ABNORMAL",
+      "signalType":"DIGITAL",
+      "alarmType":"ALARM",
+      "alarmLevel":"AL",
+      "status":"ALM",
+      "alarmTime":1450494666000,
+      "ackTime":null,
+      "normalTime":null,
+      "instVal":"OFF"
+    },
+    {
+      "vdmpath":"Mechanical/Pressurized/Boiler2/AuxBoiler1.Mode.abnormal.stVal",
+      "desc":"BOILER COMMON ABNORMAL",
+      "signalType":"DIGITAL",
+      "alarmType":"ALARM",
+      "alarmLevel":"AL",
+      "status":"ACK",
+      "alarmTime":1450494666000,
+      "ackTime":1450494676000,
+      "normalTime":null,
+      "instVal":"OFF"
+    },
+    {
+      "vdmpath":"Mechanical/Pressurized/Boiler1/AuxBoiler1.Steam1.Pressure.val",
+      "desc":"BOILER STEAM PRESS",
+      "signalType":"ANALOG",
+      "alarmType":"ALARM",
+      "alarmLevel":"LO",
+      "status":"ACK",
+      "alarmTime":1450494657000,
+      "ackTime":1450494676000,
+      "normalTime":null,
+      "instVal":"5.50"
+    },
+    {
+      "vdmpath":"Mechanical/Machinery/DieselEngine/MainEngine1/CSWPump1.Mode.abnormal.stVal",
+      "desc":"NO.1 MAIN CSW P/P ABNORMAL",
+      "signalType":"DIGITAL",
+      "alarmType":"ALARM",
+      "alarmLevel":"AL",
+      "status":"ACK",
+      "alarmTime":1450494522000,
+      "ackTime":1450494676000,
+      "normalTime":null,
+      "instVal":"OFF"
+    }
+  ]
+}
