@@ -184,13 +184,13 @@ public class PushServiceImpl implements PushService{
             public void handleMessageEvent(String msg) {
 
                 /** describe something to do */
-                LOGGER.trace("Received Message via WebSocket : {}, {}", ruleName, msg);
+                LOGGER.debug("Received Message via WebSocket : {}, {}", ruleName, msg);
 
                 if(template != null) {
                     String payload = myParser.parse(msg, getType(ruleName));
 
                     if(!(StringUtils.isEmpty(payload))) {
-                        LOGGER.trace("Sent Message via WebSocket : " + payload);
+                        LOGGER.debug("Sent Message via WebSocket : " + payload);
 
                         template.convertAndSend(DESTINATION, new Greeting(0L, payload));
                     }
