@@ -133,12 +133,12 @@ public class PushServiceImpl implements PushService{
     public void startSensor() throws Exception {
     // 1. Create a CEP event rule for 3rd party
         if (createSensorEventRule()) {
-            LOGGER.debug("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
+            LOGGER.info("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
 
             // 3. Get event data using WebScoket
             getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/sensor", PushServiceInfo.getSensorRuleName());
         } else {
-            LOGGER.debug("create SensorEventRule has failed");
+            LOGGER.info("create SensorEventRule has failed");
             init();
         }
     }
@@ -150,12 +150,12 @@ public class PushServiceImpl implements PushService{
 
     public void startAlarm() throws Exception{
         if (createAlarmEventRule()) {
-            LOGGER.debug("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
+            LOGGER.info("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
 
             // 3. Get event data using WebScoket
             getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/alarm", PushServiceInfo.getAlarmRuleName());
         }else {
-            LOGGER.debug("create AlarmEventRule has failed");
+            LOGGER.info("create AlarmEventRule has failed");
             init();
         }
     }
