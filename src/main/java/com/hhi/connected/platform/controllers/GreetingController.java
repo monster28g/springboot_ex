@@ -46,8 +46,8 @@ public class GreetingController {
         return myService.sayHello(name);
     }
 
-    @MessageMapping("/hello")
-    @SendTo("/topic/greetings")
+    @MessageMapping("/hivaas")
+    @SendTo("/topic/hivaas")
     public Object hello(HelloMessage message) {
         return StringUtils.isEmpty(message.getBody())?
                 myService.sayHello("WS echo, " + message.getName() + "!")
@@ -77,7 +77,7 @@ public class GreetingController {
     }
 
     private void tictoc() {
-        template.convertAndSend("/topic/greetings", myService.tick());
+        template.convertAndSend("/topic/hivaas", myService.tick());
     }
 
     @MessageExceptionHandler

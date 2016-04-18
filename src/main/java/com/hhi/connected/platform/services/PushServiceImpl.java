@@ -28,7 +28,7 @@ import java.security.KeyStore;
 @Component
 public class PushServiceImpl implements PushService{
     private static final Logger LOGGER = LoggerFactory.getLogger(PushServiceImpl.class);
-    private static final String DESTINATION = "/topic/greetings";
+    private static final String DESTINATION = "/topic/hivaas";
 
     @Autowired
     private SimpMessagingTemplate template;
