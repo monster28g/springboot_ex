@@ -32,7 +32,6 @@ public class ConfigController {
     @RequestMapping(value = "/api/measurements/configs/all", method = RequestMethod.GET )
     public Object getAllConfigs() {
 
-        // TODO add Validator for PathVariable
         return "/api/measurements/configs/all";
     }
 }
