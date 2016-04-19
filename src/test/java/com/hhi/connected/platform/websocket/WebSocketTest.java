@@ -78,7 +78,7 @@ public class WebSocketTest {
         byte[] payload = new ObjectMapper().writeValueAsBytes(helloMessage);
 
         StompHeaderAccessor headers = StompHeaderAccessor.create(StompCommand.SEND);
-        headers.setDestination("/app/hello");
+        headers.setDestination("/app/hivaas");
         headers.setSessionId("0");
         headers.setSessionAttributes(new HashMap<>());
         Message<byte[]> message = MessageBuilder.createMessage(payload, headers.getMessageHeaders());
@@ -91,7 +91,7 @@ public class WebSocketTest {
 
         StompHeaderAccessor replyHeaders = StompHeaderAccessor.wrap(reply);
         assertEquals("0", replyHeaders.getSessionId());
-        assertEquals("/topic/greetings", replyHeaders.getDestination());
+        assertEquals("/topic/hivaas", replyHeaders.getDestination());
 
         String json = new String((byte[]) reply.getPayload(), Charset.forName("UTF-8"));
         new JsonPathExpectationsHelper("$.content").assertValue(json, String.format("Hello, WS echo, DELL!!", name));
@@ -109,7 +109,7 @@ public class WebSocketTest {
         byte[] payload = new ObjectMapper().writeValueAsBytes(helloMessage);
 
         StompHeaderAccessor headers = StompHeaderAccessor.create(StompCommand.SEND);
-        headers.setDestination("/app/hello");
+        headers.setDestination("/app/hivaas");
         headers.setSessionId("0");
         headers.setSessionAttributes(new HashMap<>());
         Message<byte[]> message = MessageBuilder.createMessage(payload, headers.getMessageHeaders());
@@ -122,7 +122,7 @@ public class WebSocketTest {
 
         StompHeaderAccessor replyHeaders = StompHeaderAccessor.wrap(reply);
         assertEquals("0", replyHeaders.getSessionId());
-        assertEquals("/topic/greetings", replyHeaders.getDestination());
+        assertEquals("/topic/hivaas", replyHeaders.getDestination());
 
         String json = new String((byte[]) reply.getPayload(), Charset.forName("UTF-8"));
         assertTrue(json.contains("vdmSampleContent") || json.contains("alarmSampleContent"));
