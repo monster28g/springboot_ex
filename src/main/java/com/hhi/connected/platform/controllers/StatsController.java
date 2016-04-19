@@ -36,20 +36,20 @@ public class StatsController {
     public Object getDevicesProducts(@RequestParam(value="vdm") String vdm) throws UnsupportedEncodingException {
 
         // TODO add Validator for PathVariable
-        return "/stats/products/equipments";
+        return "/stats/products/equipments/devices";
     }
 
     @RequestMapping(value = "/stats/accumulation/equipments", method = RequestMethod.GET )
     public Object getEquipmentsAccumulation(@RequestParam(value="vdm") String vdm) throws UnsupportedEncodingException {
 
         // TODO add Validator for PathVariable
-        return "/stats/products/equipments";
+        return "/stats/accumulation/equipments";
     }
 
     @RequestMapping(value = "/stats/accumulation/equipments/devices", method = RequestMethod.GET )
     public Object getDevicesAccumulation(@RequestParam(value="vdm") String vdm) throws UnsupportedEncodingException {
 
         // TODO add Validator for PathVariable
-        return "/stats/products/equipments";
+        return "/stats/accumulation/equipments/devices";
     }
 }
