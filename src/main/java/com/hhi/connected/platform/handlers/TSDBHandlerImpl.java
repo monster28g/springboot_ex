@@ -25,8 +25,7 @@ public class TSDBHandlerImpl implements TSDBHandler{
 
     @Override
     public Object getMeasurements(String db, HttpMethod httpMethod) {
-        LOGGER.debug("request query : {}", String.format(measurementsQuery, host, port, MEASUREMENTS, db));
-        return restApiService.execute(String.format(measurementsQuery, host, port, MEASUREMENTS, db), httpMethod);
+        return restApiService.exchange(String.format(measurementsQuery, host, port, MEASUREMENTS, db), httpMethod);
     }
 
     @Override
