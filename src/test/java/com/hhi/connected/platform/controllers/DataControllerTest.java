@@ -52,7 +52,7 @@ public class DataControllerTest {
 
     @Test
     public void getTrends() throws Exception {
-        when(dataService.getTrends(isA(String.class), isA(Long.class), isA(Long.class), isA(String.class))).thenReturn(null);
+        when(dataService.getTrends(isA(String.class), isA(String.class), isA(Long.class), isA(Long.class), isA(String.class))).thenReturn(null);
 
         mockMvc.perform(get("/api/measurements/data/trends")
                 .param("vdm", "foo/bar")
@@ -66,7 +66,7 @@ public class DataControllerTest {
 
     @Test
     public void getTrendsLast() throws Exception {
-        when(dataService.getTrendsLast(isA(String.class), isA(String.class), isA(String.class))).thenReturn(null);
+        when(dataService.getTrendsLast(isA(String.class), isA(String.class), isA(String.class), isA(String.class))).thenReturn(null);
 
         mockMvc.perform(get("/api/measurements/data/trends")
                 .param("vdm", "foo/bar")
@@ -79,7 +79,7 @@ public class DataControllerTest {
 
     @Test
     public void getTrendsFail() throws Exception {
-        when(dataService.getTrends(isA(String.class), isA(Long.class), isA(Long.class), isA(String.class))).thenReturn(null);
+        when(dataService.getTrends(isA(String.class), isA(String.class), isA(Long.class), isA(Long.class), isA(String.class))).thenReturn(null);
 
         mockMvc.perform(get("/api/measurements/data/trends")
                 .param("vdm", "foo/bar")
@@ -88,6 +88,17 @@ public class DataControllerTest {
                 .param("epoch", "m")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError())
+                .andDo(print());
+    }
+
+    @Test
+    public void getTrendsDefault() throws Exception {
+        when(dataService.getTrends(isA(String.class), isA(String.class), isA(Long.class), isA(Long.class), isA(String.class))).thenReturn(null);
+
+        mockMvc.perform(get("/api/measurements/data/trends")
+                .param("vdm", "foo/bar")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andDo(print());
     }
 }

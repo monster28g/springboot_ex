@@ -32,8 +32,8 @@ public class DataController {
     public Object getTrends(@RequestParam(value = "vdm") String vdm,
                             @RequestParam(value = "from", required = false) Long from,
                             @RequestParam(value = "to", required = false) Long to,
-                            @RequestParam(value = "last", required = false) String last,
-                            @RequestParam(value = "epoch", defaultValue = "m") String epoch ) throws UnsupportedEncodingException {
+                            @RequestParam(value = "last", defaultValue = "1d") String last,
+                            @RequestParam(value = "epoch", defaultValue = "ms") String epoch ) throws UnsupportedEncodingException {
 
         if(StringUtils.isEmpty(vdm)){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -44,13 +44,11 @@ public class DataController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             else {
-                return dataService.getTrends(vdm, from, to, epoch);
+                return dataService.getTrends(TSDBType.DATA.getValue(), vdm, from, to, epoch);
             }
         }
-        else if (last != null) {
-            return dataService.getTrendsLast(vdm, last, epoch);
-        }
 
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return dataService.getTrendsLast(TSDBType.DATA.getValue(), vdm, last, epoch);
+
     }
 }

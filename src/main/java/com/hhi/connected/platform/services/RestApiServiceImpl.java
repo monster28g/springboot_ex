@@ -18,12 +18,11 @@ public class RestApiServiceImpl implements RestApiService{
     @Override
     public Object execute(String query, HttpMethod httpMethod) {
         try {
-            LOGGER.debug("query : {}", new URI(query));
-            return new RestTemplate() .exchange(new URI(query), httpMethod, null, Object.class);
+            LOGGER.info("query : {}", query);
+            return new RestTemplate().exchange(new URI(query), httpMethod, null, Object.class);
         } catch (URISyntaxException e) {
             LOGGER.debug(e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
     }
 }
