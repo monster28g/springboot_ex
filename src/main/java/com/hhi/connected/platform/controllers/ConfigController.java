@@ -15,21 +15,22 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.UnsupportedEncodingException;
 
 @RestController
+@RequestMapping(value = "/api/measurements/configs")
 public class ConfigController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigController.class);
 
     @Autowired
     private TSDBHandler tsdbHandler;
 
-    @RequestMapping(value = "/api/measurements/configs", method = RequestMethod.GET )
+    @RequestMapping(method = RequestMethod.GET )
     public Object getMeasurementsConfigs(@RequestParam(value="vdm") String vdm) throws UnsupportedEncodingException {
 
         // TODO add Validator for PathVariable
         LOGGER.debug("query : vdm = {}", vdm);
-        return StringUtils.isEmpty(vdm) ? new ResponseEntity<>(HttpStatus.BAD_REQUEST) : vdm;
+        return StringUtils.isEmpty(vdm) ? new ResponseEntity<>(HttpStatus.BAD_REQUEST) : "/api/measurements/configs";
     }
 
-    @RequestMapping(value = "/api/measurements/configs/all", method = RequestMethod.GET )
+    @RequestMapping(value = "/all", method = RequestMethod.GET )
     public Object getAllConfigs() {
 
         return "/api/measurements/configs/all";
