@@ -1,9 +1,10 @@
 package com.hhi.connected.platform.controllers;
 
-import com.hhi.connected.platform.handlers.TSDBHandler;
+import com.hhi.connected.platform.handlers.ConfigTSDBHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -20,19 +21,20 @@ public class ConfigController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigController.class);
 
     @Autowired
-    private TSDBHandler tsdbHandler;
+    private ConfigTSDBHandler configTSDBHandler;
 
     @RequestMapping(method = RequestMethod.GET )
-    public Object getMeasurementsConfigs(@RequestParam(value="vdm") String vdm) throws UnsupportedEncodingException {
+    public Object getConfig(@RequestParam(value="vdm") String vdm) throws UnsupportedEncodingException {
 
         // TODO add Validator for PathVariable
         LOGGER.debug("query : vdm = {}", vdm);
-        return StringUtils.isEmpty(vdm) ? new ResponseEntity<>(HttpStatus.BAD_REQUEST) : "/api/measurements/configs";
+//        return StringUtils.isEmpty(vdm) ? new ResponseEntity<>(HttpStatus.BAD_REQUEST) : "/api/measurements/configs";
+        return StringUtils.isEmpty(vdm) ? new ResponseEntity<>(HttpStatus.BAD_REQUEST) : configTSDBHandler.getConfigLatestOne(vdm, HttpMethod.GET);
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.GET )
     public Object getAllConfigs() {
 
-        return "/api/measurements/configs/all";
+        return configTSDBHandler.getAllConfigs(HttpMethod.GET);
     }
 }

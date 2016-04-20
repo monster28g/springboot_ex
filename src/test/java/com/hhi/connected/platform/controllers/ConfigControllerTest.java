@@ -1,10 +1,12 @@
 package com.hhi.connected.platform.controllers;
 
 import com.hhi.connected.platform.Application;
+import com.hhi.connected.platform.handlers.ConfigTSDBHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
@@ -21,6 +23,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
 public class ConfigControllerTest {
+
+    @Mock
+    ConfigTSDBHandler configTSDBHandler;
 
     @InjectMocks
     private ConfigController configController;
