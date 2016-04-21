@@ -1,5 +1,6 @@
 package com.hhi.connected.platform.handlers;
 
+import com.hhi.connected.platform.models.enums.TSDBType;
 import com.hhi.connected.platform.services.ConfigApiService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,6 @@ import java.net.URLEncoder;
 public class ConfigTSDBHandlerImpl implements ConfigTSDBHandler{
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigTSDBHandlerImpl.class);
 
-    private final String db = "hivaas_config";
     private final String host = "10.100.16.66";
     private final String port = "8086";
     private final String MEASUREMENTS = "SHOW+MEASUREMENTS";
@@ -26,13 +26,13 @@ public class ConfigTSDBHandlerImpl implements ConfigTSDBHandler{
 
     @Override
     public Object getConfigLatestOne(String vdm, HttpMethod httpMethod) throws UnsupportedEncodingException {
-        return configApiService.execute(String.format(query, host, port, db,
+        return configApiService.execute(String.format(query, host, port, TSDBType.CONFIG.getValue(),
                 URLEncoder.encode("SELECT * FROM \""+vdm+"\" ORDER BY time DESC limit 1", "UTF-8")), httpMethod);
     }
 
     @Override
     public Object getAllConfigs(HttpMethod httpMethod) {
-        LOGGER.debug("request query : {}", String.format(measurementsQuery, host, port, MEASUREMENTS, db));
-        return configApiService.execute(String.format(measurementsQuery, host, port, MEASUREMENTS, db), httpMethod);
+        LOGGER.debug("request query : {}", String.format(measurementsQuery, host, port, MEASUREMENTS, TSDBType.CONFIG.getValue()));
+        return configApiService.execute(String.format(measurementsQuery, host, port, MEASUREMENTS, TSDBType.CONFIG.getValue()), httpMethod);
     }
 }
