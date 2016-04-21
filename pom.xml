@@ -166,7 +166,6 @@
             <artifactId>guava</artifactId>
             <version>19.0</version>
         </dependency>
-
     </dependencies>
 
 
@@ -200,15 +199,21 @@
     </build>
 
     <repositories>
+
         <repository>
             <id>spring-releases</id>
             <url>https://repo.spring.io/libs-release</url>
+        </repository>
+        <repository>
+            <id>spring-snapshot</id>
+            <url>http://repo.spring.io/snapshot</url>
         </repository>
         <repository>
             <id>releases</id>
             <url>https://repo-hivaas.hhi.co.kr/content/repositories/releases</url>
         </repository>
     </repositories>
+
     <pluginRepositories>
         <pluginRepository>
             <id>spring-releases</id>
