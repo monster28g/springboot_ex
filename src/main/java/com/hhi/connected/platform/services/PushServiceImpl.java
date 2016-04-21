@@ -34,6 +34,9 @@ public class PushServiceImpl implements PushService{
     private SimpMessagingTemplate template;
 
     @Autowired
+    private SimpleGatewayService simpleGatewayService;
+
+    @Autowired
     private MyParser myParser;
 
     private APIGatewayClient apiGatewayClient;
@@ -193,6 +196,7 @@ public class PushServiceImpl implements PushService{
                         LOGGER.debug("Sent Message via WebSocket : " + payload);
 
                         template.convertAndSend(DESTINATION, new Greeting(0L, payload));
+                        simpleGatewayService.send(payload);
                     }
             }
 
