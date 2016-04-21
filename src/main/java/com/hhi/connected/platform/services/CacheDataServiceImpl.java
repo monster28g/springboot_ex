@@ -4,14 +4,14 @@ import com.hhi.connected.platform.models.BaseModel;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Component
+@Service
 public class CacheDataServiceImpl implements CacheDataService{
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheDataServiceImpl.class);
 
