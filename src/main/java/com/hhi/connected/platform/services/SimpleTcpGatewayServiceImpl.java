@@ -12,8 +12,8 @@ import java.net.Socket;
 public class SimpleTcpGatewayServiceImpl implements SimpleGatewayService{
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleTcpGatewayServiceImpl.class);
 
-    static final String HOST = "127.0.0.1";
-    static final int PORT = 5678;
+    static final String HOST = "localhost";
+    static final int PORT = 18088;
 
     Socket socket;
 
