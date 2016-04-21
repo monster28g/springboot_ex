@@ -13,7 +13,7 @@ public class SimpleTcpGatewayServiceImpl implements SimpleGatewayService{
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleTcpGatewayServiceImpl.class);
 
     static final String HOST = "localhost";
-    static final int PORT = 18088;
+    static final int PORT = 18888;
 
     Socket socket;
 
