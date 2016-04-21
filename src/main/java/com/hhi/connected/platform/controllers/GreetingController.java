@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,9 +35,6 @@ public class GreetingController {
     private final AtomicLong counter = new AtomicLong();
 
     @Autowired
-    private SimpMessagingTemplate template;
-
-    @Autowired
     private TaskScheduler scheduler;
 
     @RequestMapping(value = "/greeting", method = RequestMethod.GET )
@@ -56,7 +52,6 @@ public class GreetingController {
 
     @PostConstruct
     private void broadcastTimePeriodically() {
-        scheduler.scheduleAtFixedRate(this::tictoc, 60000L);
         scheduler.scheduleAtFixedRate(this::keepAlivePushService, 60000L);
 
     }
@@ -74,10 +69,6 @@ public class GreetingController {
                 }
             }
         }
-    }
-
-    private void tictoc() {
-        template.convertAndSend("/topic/hivaas", myService.tick());
     }
 
     @MessageExceptionHandler
