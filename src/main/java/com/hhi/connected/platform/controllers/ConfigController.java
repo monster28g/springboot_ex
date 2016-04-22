@@ -34,6 +34,7 @@ public class ConfigController {
 
     @RequestMapping(value = "/all", method = RequestMethod.GET )
     public Object getAllConfigs() {
+        //TODO each value return
 
         return configTSDBHandler.getAllConfigs(HttpMethod.GET);
     }

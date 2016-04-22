@@ -53,7 +53,7 @@ public class StatsControllerTest {
 
     @Test
     public void testGetEquipmentsProducts() throws Exception {
-        when(statsTSDBHandler.getProductsOfEquipmets(isA(String.class), isA(HttpMethod.class))).thenReturn(null);
+        when(statsTSDBHandler.getProductsOfEquipments(isA(String.class), isA(HttpMethod.class))).thenReturn(null);
 
         mockMvc.perform(get("/stats/products/equipments")
                 .param("vdm","foo/bar")
@@ -64,7 +64,7 @@ public class StatsControllerTest {
 
     @Test
     public void testGetDevicesProducts() throws Exception {
-        when(statsTSDBHandler.getProductsOfDevices(isA(String.class), isA(HttpMethod.class))).thenReturn(null);
+        when(statsTSDBHandler.getProductsOfDevices(isA(HttpMethod.class))).thenReturn(null);
 
         mockMvc.perform(get("/stats/products/equipments/devices")
                 .param("vdm","foo/bar")
@@ -86,7 +86,7 @@ public class StatsControllerTest {
 
     @Test
     public void testGetDevicesAccumulation() throws Exception {
-        when(statsTSDBHandler.getAccumulationOfDevices(isA(String.class), isA(HttpMethod.class))).thenReturn(null);
+        when(statsTSDBHandler.getAccumulationOfDevices(isA(HttpMethod.class))).thenReturn(null);
 
         mockMvc.perform(get("/stats/accumulation/equipments/devices")
                 .param("vdm","foo/bar")

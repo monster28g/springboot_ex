@@ -16,6 +16,7 @@ import java.net.URLEncoder;
 public class StatsTSDBHandlerImpl implements StatsTSDBHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(StatsTSDBHandlerImpl.class);
 
+    private final String column = "status";
     private final String host = "10.100.16.66";
     private final String port = "8086";
     private final String MEASUREMENTS = "SHOW+MEASUREMENTS";
@@ -32,30 +33,31 @@ public class StatsTSDBHandlerImpl implements StatsTSDBHandler {
     }
 
     @Override
-    public Object getProductsOfEquipmets(String vdm, HttpMethod httpMethod) throws UnsupportedEncodingException {
+    public Object getProductsOfEquipments(String vdm, HttpMethod httpMethod) throws UnsupportedEncodingException {
 
+        //TODO DB change
         return statsAPIService.execute(String.format(query, host, port, TSDBType.ALARM.getValue(),
-                URLEncoder.encode("SELECT status FROM "+ new InsertBackslash().insertBackslash(vdm)+"/", "UTF-8")), httpMethod);
+                URLEncoder.encode("SELECT count("+column+") FROM "+ new InsertBackslash().insertBackslash(vdm)+"/", "UTF-8")), httpMethod);
     }
 
     @Override
-    public Object getProductsOfDevices(String vdm, HttpMethod httpMethod) throws UnsupportedEncodingException {
+    public Object getProductsOfDevices(HttpMethod httpMethod) throws UnsupportedEncodingException {
 
         return statsAPIService.execute(String.format(query, host, port, TSDBType.ALARM.getValue(),
-                URLEncoder.encode("SELECT status FROM \""+vdm+"\"", "UTF-8")), httpMethod);
+                URLEncoder.encode("SELECT count("+column+") FROM /.*/", "UTF-8")), httpMethod);
     }
 
     @Override
     public Object getAccumulationOfEquipments(String vdm, HttpMethod httpMethod) throws UnsupportedEncodingException {
 
         return statsAPIService.execute(String.format(query, host, port, TSDBType.ALARM.getValue(),
-                URLEncoder.encode("SELECT status FROM "+new InsertBackslash().insertBackslash(vdm)+"/", "UTF-8")), httpMethod);
+                URLEncoder.encode("SELECT count("+column+") FROM "+new InsertBackslash().insertBackslash(vdm)+"/", "UTF-8")), httpMethod);
     }
 
     @Override
-    public Object getAccumulationOfDevices(String vdm, HttpMethod httpMethod) throws UnsupportedEncodingException {
+    public Object getAccumulationOfDevices(HttpMethod httpMethod) throws UnsupportedEncodingException {
 
         return statsAPIService.execute(String.format(query, host, port, TSDBType.ALARM.getValue(),
-                URLEncoder.encode("SELECT status FROM \""+vdm+"\"", "UTF-8")), httpMethod);
+                URLEncoder.encode("SELECT count("+column+") FROM /.*/", "UTF-8")), httpMethod);
     }
 }

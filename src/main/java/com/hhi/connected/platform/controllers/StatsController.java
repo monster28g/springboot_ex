@@ -26,6 +26,7 @@ public class StatsController {
     @RequestMapping(method = RequestMethod.GET )
     public Object getStats() {
 
+        //TODO ALL value
         return statsTSDBHandler.getAllStats(HttpMethod.GET);
     }
 
@@ -34,15 +35,14 @@ public class StatsController {
 
         // TODO add Validator for PathVariable
         LOGGER.debug("query : vdm = {}", vdm);
-        return StringUtils.isEmpty(vdm) ? new ResponseEntity<>(HttpStatus.BAD_REQUEST) : statsTSDBHandler.getProductsOfEquipmets(vdm, HttpMethod.GET);
+        return StringUtils.isEmpty(vdm) ? new ResponseEntity<>(HttpStatus.BAD_REQUEST) : statsTSDBHandler.getProductsOfEquipments(vdm, HttpMethod.GET);
     }
 
     @RequestMapping(value = "/products/equipments/devices", method = RequestMethod.GET )
-    public Object getProductsOfDevices(@RequestParam(value="vdm") String vdm) throws UnsupportedEncodingException {
+    public Object getProductsOfDevices() throws UnsupportedEncodingException {
 
         // TODO add Validator for PathVariable
-        LOGGER.debug("query : vdm = {}", vdm);
-        return StringUtils.isEmpty(vdm) ? new ResponseEntity<>(HttpStatus.BAD_REQUEST) : statsTSDBHandler.getProductsOfDevices(vdm, HttpMethod.GET);
+        return statsTSDBHandler.getProductsOfDevices(HttpMethod.GET);
     }
 
     @RequestMapping(value = "/accumulation/equipments", method = RequestMethod.GET )
@@ -54,10 +54,9 @@ public class StatsController {
     }
 
     @RequestMapping(value = "/accumulation/equipments/devices", method = RequestMethod.GET )
-    public Object getAccumulationOfDevices(@RequestParam(value="vdm") String vdm) throws UnsupportedEncodingException {
+    public Object getAccumulationOfDevices() throws UnsupportedEncodingException {
 
         // TODO add Validator for PathVariable
-        LOGGER.debug("query : vdm = {}", vdm);
-        return StringUtils.isEmpty(vdm) ? new ResponseEntity<>(HttpStatus.BAD_REQUEST) : statsTSDBHandler.getAccumulationOfDevices(vdm, HttpMethod.GET);
+        return statsTSDBHandler.getAccumulationOfDevices(HttpMethod.GET);
     }
 }
