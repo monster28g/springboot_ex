@@ -48,8 +48,8 @@ public class PushServiceInfo {
     }
 
     /** Push rule name which is created beforehand */
-    public static final String sensorRuleName = "sensor001_ace";
+    public static final String sensorRuleName = "sensor001";
 
     /** Push rule name which is created beforehand */
-    public static final String alarmRuleName = "alarm001_ace";
+    public static final String alarmRuleName = "alarm001";
 }
