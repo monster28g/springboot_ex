@@ -28,7 +28,6 @@ public class ConfigController {
 
         // TODO add Validator for PathVariable
         LOGGER.debug("query : vdm = {}", vdm);
-//        return StringUtils.isEmpty(vdm) ? new ResponseEntity<>(HttpStatus.BAD_REQUEST) : "/api/measurements/configs";
         return StringUtils.isEmpty(vdm) ? new ResponseEntity<>(HttpStatus.BAD_REQUEST) : configTSDBHandler.getConfigLatestOne(vdm, HttpMethod.GET);
     }
 

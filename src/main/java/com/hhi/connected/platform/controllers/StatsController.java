@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.UnsupportedEncodingException;
 
 @RestController
-@RequestMapping(value = "/stats")
+@RequestMapping(value = "/api/stats")
 public class StatsController {
     private static final Logger LOGGER = LoggerFactory.getLogger(StatsController.class);
 

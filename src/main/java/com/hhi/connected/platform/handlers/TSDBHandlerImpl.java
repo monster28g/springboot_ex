@@ -4,6 +4,7 @@ import com.hhi.connected.platform.services.RestApiService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +15,12 @@ import java.net.URLEncoder;
 public class TSDBHandlerImpl implements TSDBHandler{
     private static final Logger LOGGER = LoggerFactory.getLogger(TSDBHandlerImpl.class);
 
-    private final String host = "10.100.16.66";
-    private final String port = "8086";
+    @Value("${influxdb.host}")
+    private String host;
+
+    @Value("${influxdb.port}")
+    private String port;
+
     private final String MEASUREMENTS = "SHOW+MEASUREMENTS";
 
     @Autowired
