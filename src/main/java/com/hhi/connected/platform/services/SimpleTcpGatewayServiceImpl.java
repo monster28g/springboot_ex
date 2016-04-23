@@ -13,10 +13,10 @@ import java.net.Socket;
 public class SimpleTcpGatewayServiceImpl implements SimpleGatewayService{
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleTcpGatewayServiceImpl.class);
 
-    @Value("${tcpserver.host}")
+    @Value("${gateway.host}")
     private String host;
 
-    @Value("${tcpserver.port}")
+    @Value("${gateway.port}")
     private int port;
 
     Socket socket;

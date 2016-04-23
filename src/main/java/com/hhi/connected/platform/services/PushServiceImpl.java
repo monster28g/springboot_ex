@@ -3,7 +3,6 @@ package com.hhi.connected.platform.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hhi.connected.platform.models.APIInfo;
 import com.hhi.connected.platform.models.Greeting;
-import com.hhi.connected.platform.models.PushServiceInfo;
 import com.hhi.connected.platform.models.enums.ModelType;
 import com.hhi.connected.platform.services.utils.RegisterUtil;
 import com.hhi.vaas.platform.middleware.client.rest.APIGatewayClient;
@@ -13,8 +12,9 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.ws.rs.core.Response;
@@ -25,10 +25,53 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.security.KeyStore;
 
-@Component
+@Service
 public class PushServiceImpl implements PushService{
     private static final Logger LOGGER = LoggerFactory.getLogger(PushServiceImpl.class);
-    private static final String DESTINATION = "/topic/hivaas";
+
+    @Value("${push.service.sensorRuleName}")
+    private String sensorRuleName;
+
+    @Value("${push.service.alarmRuleName}")
+    private String alarmRuleName;
+
+    @Value("${push.service.destination}")
+    private String destination;
+
+    @Value("${push.service.duration}")
+    private int duration;
+
+    @Value("${push.service.tokenApiUrl}")
+    private String tokenApiUrl;
+
+    @Value("${push.service.cepApiUrl}")
+    private String cepApiUrl;
+    //    private String registerApiUrl = "http://10.100.16.82:8380/register/v1.0";
+
+    @Value("${push.service.registerApiUrl}")
+    private String registerApiUrl;
+
+    @Value("${push.service.pushApiUrl}")
+    private String pushApiUrl;
+
+    /** App Info */
+    @Value("${push.service.confFileName}")
+    private String confFileName;
+
+    @Value("${push.service.registerAppName}")
+    private String registerAppName;
+
+    @Value("${push.service.dplFileName}")
+    private String dplFileName;
+
+    @Value("${push.service.jksFileName}")
+    private String jksFileName;
+
+    @Value("${push.service.keyFileName}")
+    private String keyFileName;
+
+    @Value("${push.service.passPhrase}")
+    private String passPhrase;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -50,11 +93,8 @@ public class PushServiceImpl implements PushService{
     private static String consumerKey;
     private static String consumerSecret;
 
-    private static int duration = 10;
 
     public PushServiceImpl() throws Exception {
-        init();
-        run();
     }
 
     @Override
@@ -70,41 +110,41 @@ public class PushServiceImpl implements PushService{
 
     private void init() throws Exception {
         if(registerSoftware()){
-            deleteSensorEventRules(PushServiceInfo.getSensorRuleName());
-            deleteAlarmEventRules(PushServiceInfo.getAlarmRuleName());
+            deleteSensorEventRules(sensorRuleName);
+            deleteAlarmEventRules(alarmRuleName);
         }
     }
 
     // Register 3rd Party S/W Certificate and get API information
     public boolean registerSoftware() throws Exception {
-        File file = new File(PushServiceImpl.class.getResource("/").getFile(), PushServiceInfo.confFileName);
+        File file = new File(PushServiceImpl.class.getResource("/").getFile(), confFileName);
 
         APIInfo apiInfo;
         if (!file.exists()) {
             // Not registered in VDIP
 
             // Loading Signed DPL
-            URI dplFile = PushServiceImpl.class.getResource("/" + PushServiceInfo.dplFileName).toURI();
+            URI dplFile = PushServiceImpl.class.getResource("/" + dplFileName).toURI();
 
             boolean usingKeyStore = true;
 
             if (usingKeyStore) {
                 // Loading keyStore
                 KeyStore keyStore  = KeyStore.getInstance(KeyStore.getDefaultType());
-                keyStore.load(PushServiceImpl.class.getResourceAsStream("/" + PushServiceInfo.jksFileName), PushServiceInfo.passPhrase.toCharArray());
+                keyStore.load(PushServiceImpl.class.getResourceAsStream("/" + jksFileName), passPhrase.toCharArray());
 
                 // Register 3rd Party S/W Certificate and get API information
-                apiInfo = RegisterUtil.registCertificate(PushServiceInfo.registerApiUrl, PushServiceInfo.registerAppName, keyStore, PushServiceInfo.passPhrase, dplFile);
+                apiInfo = RegisterUtil.registCertificate(registerApiUrl, registerAppName, keyStore, passPhrase, dplFile);
             } else {
                 // Loading privateKey
-                URI keyFile = PushServiceImpl.class.getResource("/" + PushServiceInfo.keyFileName).toURI();
+                URI keyFile = PushServiceImpl.class.getResource("/" + keyFileName).toURI();
 
                 // Register 3rd Party S/W Certificate and get API information
-                apiInfo = RegisterUtil.registCertificate(PushServiceInfo.registerApiUrl, PushServiceInfo.registerAppName, keyFile, dplFile);
+                apiInfo = RegisterUtil.registCertificate(registerApiUrl, registerAppName, keyFile, dplFile);
             }
 
             if (apiInfo != null) {
-                LOGGER.debug("[" + PushServiceInfo.registerAppName + "] has been registered successfully.");
+                LOGGER.debug("[" + registerAppName + "] has been registered successfully.");
                 LOGGER.debug(apiInfo.toString());
 
                 username = apiInfo.getUsername();
@@ -115,7 +155,7 @@ public class PushServiceImpl implements PushService{
                 IOUtils.write(RegisterUtil.mapper.writeValueAsString(apiInfo), new FileOutputStream(file));
                 return true;
             } else {
-                LOGGER.debug("[" + PushServiceInfo.registerAppName + "] already registered but access info doesn't exist.");
+                LOGGER.debug("[" + registerAppName + "] already registered but access info doesn't exist.");
                 return false;
             }
         } else {
@@ -139,7 +179,7 @@ public class PushServiceImpl implements PushService{
             LOGGER.info("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
 
             // 3. Get event data using WebScoket
-            getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/sensor", PushServiceInfo.getSensorRuleName());
+            getDataUsingWebSocket(pushApiUrl + "/sensor", sensorRuleName);
         } else {
             LOGGER.info("create SensorEventRule has failed");
             init();
@@ -156,7 +196,7 @@ public class PushServiceImpl implements PushService{
             LOGGER.info("\n:+:+:+:+ Waiting for seconds to refresh CEP event modules :+:+:+:+");
 
             // 3. Get event data using WebScoket
-            getDataUsingWebSocket(PushServiceInfo.pushApiUrl + "/alarm", PushServiceInfo.getAlarmRuleName());
+            getDataUsingWebSocket(pushApiUrl + "/alarm", alarmRuleName);
         }else {
             LOGGER.info("create AlarmEventRule has failed");
             init();
@@ -195,7 +235,7 @@ public class PushServiceImpl implements PushService{
                     if(!(StringUtils.isEmpty(payload))) {
                         LOGGER.debug("Sent Message via WebSocket : " + payload);
 
-                        template.convertAndSend(DESTINATION, new Greeting(0L, payload));
+                        template.convertAndSend(destination, new Greeting(0L, payload));
                         simpleGatewayService.send(payload);
                     }
             }
@@ -232,7 +272,7 @@ public class PushServiceImpl implements PushService{
     }
 
     private ModelType getType(String ruleName) {
-        return ruleName.equals(PushServiceInfo.getSensorRuleName())? ModelType.DATA : ruleName.equals(PushServiceInfo.getAlarmRuleName())?ModelType.ALARM:null;
+        return ruleName.equals(sensorRuleName)? ModelType.DATA : ruleName.equals(alarmRuleName)?ModelType.ALARM:null;
     }
 
 
@@ -262,7 +302,7 @@ public class PushServiceImpl implements PushService{
             initClient();
         }
 
-        String apiUrl = PushServiceInfo.cepApiUrl + "/" + ruleType + "?ruleName=" + ruleName;
+        String apiUrl = cepApiUrl + "/" + ruleType + "?ruleName=" + ruleName;
 
         Response response = apiGatewayClient.deleteRequest(apiUrl);
 
@@ -295,7 +335,7 @@ public class PushServiceImpl implements PushService{
 
         Integer timeWindow = 1;
 
-        return createRule(PushServiceInfo.cepApiUrl + "/createSensorRule", fullPaths, timeWindow, PushServiceInfo.getSensorRuleName());
+        return createRule(cepApiUrl + "/createSensorRule", fullPaths, timeWindow, sensorRuleName);
         
     }
 
@@ -304,7 +344,7 @@ public class PushServiceImpl implements PushService{
         String fullPaths = "*";
         Integer timeWindow = 2;
 
-        return createRule(PushServiceInfo.cepApiUrl + "/createAlarmRule", fullPaths, timeWindow, PushServiceInfo.getAlarmRuleName());
+        return createRule(cepApiUrl + "/createAlarmRule", fullPaths, timeWindow, alarmRuleName);
     }
 
     private boolean createRule(String apiUrl, String fullPaths, Integer timeWindow, String ruleName) throws Exception {
@@ -322,7 +362,7 @@ public class PushServiceImpl implements PushService{
     }
 
     private void initClient() {
-        apiGatewayClient = new APIGatewayClient(PushServiceInfo.tokenApiUrl, username, password, consumerKey, consumerSecret);
+        apiGatewayClient = new APIGatewayClient(tokenApiUrl, username, password, consumerKey, consumerSecret);
     }
 
 }
