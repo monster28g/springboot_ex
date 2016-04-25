@@ -15,3 +15,5 @@
 
 ### Test the service
 ./gradlew bootRun
+
+# test for git noti to slack
