@@ -11,6 +11,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,6 +26,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
+@TestPropertySource({
+        "/gateway.properties",
+        "/db.properties",
+        "/push_service.properties"
+})
 public class StatsControllerTest {
 
     @Mock
@@ -45,7 +51,7 @@ public class StatsControllerTest {
     public void testGetStats() throws Exception {
         when(statsTSDBHandler.getAllStats(isA(HttpMethod.class))).thenReturn(null);
 
-        mockMvc.perform(get("/stats")
+        mockMvc.perform(get("/api/stats")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -55,7 +61,7 @@ public class StatsControllerTest {
     public void testGetEquipmentsProducts() throws Exception {
         when(statsTSDBHandler.getProductsOfEquipments(isA(String.class), isA(HttpMethod.class))).thenReturn(null);
 
-        mockMvc.perform(get("/stats/products/equipments")
+        mockMvc.perform(get("/api/stats/products/equipments")
                 .param("vdm","foo/bar")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -66,7 +72,7 @@ public class StatsControllerTest {
     public void testGetDevicesProducts() throws Exception {
         when(statsTSDBHandler.getProductsOfDevices(isA(HttpMethod.class))).thenReturn(null);
 
-        mockMvc.perform(get("/stats/products/equipments/devices")
+        mockMvc.perform(get("/api/stats/products/equipments/devices")
                 .param("vdm","foo/bar")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -77,7 +83,7 @@ public class StatsControllerTest {
     public void testGetEquipmentsAccumulation() throws Exception {
         when(statsTSDBHandler.getAccumulationOfEquipments(isA(String.class), isA(HttpMethod.class))).thenReturn(null);
 
-        mockMvc.perform(get("/stats/accumulation/equipments")
+        mockMvc.perform(get("/api/stats/accumulation/equipments")
                 .param("vdm","foo/bar")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -88,7 +94,7 @@ public class StatsControllerTest {
     public void testGetDevicesAccumulation() throws Exception {
         when(statsTSDBHandler.getAccumulationOfDevices(isA(HttpMethod.class))).thenReturn(null);
 
-        mockMvc.perform(get("/stats/accumulation/equipments/devices")
+        mockMvc.perform(get("/api/stats/accumulation/equipments/devices")
                 .param("vdm","foo/bar")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
