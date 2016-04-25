@@ -27,9 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
 @TestPropertySource({
-        "/gateway.properties",
-        "/db.properties",
-        "/push_service.properties"
+        "/properties/gateway.properties",
+        "/properties/db.properties",
+        "/properties/push_service.properties"
 })
 public class RestApiControllerTest {
 

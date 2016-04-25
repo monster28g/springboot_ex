@@ -8,9 +8,9 @@ import org.springframework.context.annotation.PropertySources;
 
 @SpringBootApplication
 @PropertySources({
-        @PropertySource(value = "gateway.properties", ignoreResourceNotFound = true),
-        @PropertySource(value = "db.properties", ignoreResourceNotFound = true),
-        @PropertySource(value = "push_service.properties", ignoreResourceNotFound = true)
+        @PropertySource(value = "/properties/gateway.properties", ignoreResourceNotFound = true),
+        @PropertySource(value = "/properties/db.properties", ignoreResourceNotFound = true),
+        @PropertySource(value = "/properties/push_service.properties", ignoreResourceNotFound = true)
 })
 public class Application {
     public static void main(String[] args) {

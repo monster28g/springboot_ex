@@ -31,7 +31,7 @@ public class MyParserImplTest {
 
     @Test
     public void testParse() throws Exception {
-        String message = FileUtils.readFileToString(new File(this.getClass().getResource("/data.json").getFile()));
+        String message = FileUtils.readFileToString(new File(this.getClass().getResource("/sample_data/data.json").getFile()));
         System.out.println(myParser.parse(message, ModelType.DATA));
         assertNotNull(myParser.parse(message, ModelType.DATA));
         assertNull(myParser.parse("", null));

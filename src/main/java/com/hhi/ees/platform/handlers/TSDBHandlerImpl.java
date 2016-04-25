@@ -19,7 +19,7 @@ public class TSDBHandlerImpl implements TSDBHandler{
     private String host;
 
     @Value("${influxdb.port}")
-    private Integer port;
+    private int port;
 
     private final String MEASUREMENTS = "SHOW+MEASUREMENTS";
 
