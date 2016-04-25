@@ -192,7 +192,7 @@
                 </executions>
 
                 <configuration>
-                    <mainClass>com.hhi.connected.platform.Application</mainClass>
+                    <mainClass>com.hhi.ees.platform.Application</mainClass>
                 </configuration>
             </plugin>
         </plugins>
