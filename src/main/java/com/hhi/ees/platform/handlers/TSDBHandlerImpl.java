@@ -15,6 +15,8 @@ import java.net.URLEncoder;
 public class TSDBHandlerImpl implements TSDBHandler{
     private static final Logger LOGGER = LoggerFactory.getLogger(TSDBHandlerImpl.class);
 
+    // TODO make this class to utils
+    
     @Value("${influxdb.host}")
     private String host;
 
