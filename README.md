@@ -15,3 +15,7 @@
 
 ### Test the service
 ./gradlew bootRun
+
+### JPA test(embedded H2 web console) 
+http://localhost:18080/console
+jdbc:h2:~/queryHistory
