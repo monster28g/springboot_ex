@@ -25,7 +25,7 @@
     <logger name="org.hibernate.SQL" level="INFO"/>
     <logger name="org.quartz.core" level="INFO"/>
     <logger name="org.h2.server.web" level="INFO"/>
-    <logger name="com.hhi.connected.platform" level="INFO"/>
+    <logger name="com.hhi.ees.platform" level="INFO"/>
 
     <root level="INFO">
         <appender-ref ref="dailyRollingFileAppender" />
