@@ -220,7 +220,7 @@ public class PushServiceImpl implements PushService{
      * @throws InterruptedException
      */
     private void getDataUsingWebSocket(String endpointURI, String ruleName) throws URISyntaxException {
-        final boolean ackMode = true;
+        final boolean ackMode = false;
 
         EventHandler handler = new EventHandler() {
             @Override
